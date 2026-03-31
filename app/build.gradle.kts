@@ -67,12 +67,6 @@ dependencies {
     implementation(project(":ui"))
     implementation(project(":settings"))
 
-    testImplementation(libs.junit)
-    testImplementation(libs.room.testing)
-    testImplementation(libs.mockk)
-    testImplementation(libs.kotlinx.coroutines.test)
-    testImplementation(libs.koin.test)
-
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))

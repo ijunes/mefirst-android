@@ -1,5 +1,11 @@
 package com.ijunes.mefirst.common.util
 
+import org.junit.Assert.assertEquals
+import org.junit.Test
+import java.util.Calendar
+import java.util.Locale
+import java.util.TimeZone
+
 class TimeUtilTest {
 
     // Fix timezone so assertions are deterministic regardless of where the test runs.

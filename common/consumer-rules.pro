@@ -1,0 +1,1 @@
+# Common consumer rules

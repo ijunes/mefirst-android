@@ -5,6 +5,11 @@ import com.ijunes.mefirst.database.MeFirstDatabase
 import com.ijunes.mefirst.database.entity.EntryEntity
 import com.ijunes.mefirst.database.model.MediaType
 import com.ijunes.mefirst.entries.repository.EntriesRepositoryImpl
+import io.mockk.every
+import io.mockk.mockk
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
@@ -20,7 +25,7 @@ class EntriesRepositoryImplTest {
     @Before
     fun setUp() {
         mockDao = mockk()
-        mockDb = mockk { every { MeFirstDatabase.entriesDao() } returns mockDao }
+        mockDb = mockk { every { entriesDao() } returns mockDao }
         repo = EntriesRepositoryImpl(mockDb)
     }
 
