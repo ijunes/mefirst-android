@@ -1,16 +1,15 @@
-package com.ijunes.mefirst
+package com.ijunes.mefirst.today.presentation
 
 import android.Manifest
 import android.app.Application
 import android.content.pm.PackageManager
 import android.net.Uri
 import androidx.core.content.FileProvider
+import com.ijunes.mefirst.common.action.MainAction
 import com.ijunes.mefirst.common.state.ModeStateHolder
-import com.ijunes.mefirst.today.data.repository.TodayRepositoryImpl
-import com.ijunes.mefirst.today.data.repository.WorkTodayRepositoryImpl
-import com.ijunes.mefirst.today.domain.TodayAction
-import com.ijunes.mefirst.main.MainAction
-import com.ijunes.mefirst.today.presentation.TodayScreenViewModel
+import com.ijunes.today.data.TodayRepository
+import com.ijunes.today.data.WorkTodayRepository
+import com.ijunes.today.domain.TodayAction
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -37,31 +36,29 @@ import org.koin.dsl.module
 import java.io.File
 
 /**
- * Unit tests for [com.ijunes.mefirst.today.presentation.TodayScreenViewModel.handleEvent] dispatch logic.
+ * Unit tests for [TodayScreenViewModelImpl.handleEvent] dispatch logic.
  *
- * The ViewModel resolves its dependencies via KoinJavaComponent using the *concrete*
- * implementation class as the key, so each mock is registered in the test Koin module
- * under its concrete class.
+ * Repositories and [ModeStateHolder] are mocked and registered in a test Koin module under their
+ * interface types, matching the production bindings in `:today:todayApp`.
  */
-class TodayScreenViewModelTest {
+class TodayScreenViewModelImplTest {
 
     private val testDispatcher = StandardTestDispatcher()
 
-    private lateinit var mockPersonalRepo: TodayRepositoryImpl
-    private lateinit var mockWorkRepo: WorkTodayRepositoryImpl
+    private lateinit var mockPersonalRepo: TodayRepository
+    private lateinit var mockWorkRepo: WorkTodayRepository
     private lateinit var mockModeHolder: ModeStateHolder
     private lateinit var mockApp: Application
 
     private val modeFlow = MutableStateFlow(false)
 
-    private lateinit var viewModel: TodayScreenViewModel
+    private lateinit var viewModel: TodayScreenViewModelImpl
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
 
-        // Relaxed mocks: un-stubbed calls return safe defaults (emptyFlow, Unit, etc.)
         mockPersonalRepo = mockk(relaxed = true)
         mockWorkRepo = mockk(relaxed = true)
         mockModeHolder = mockk(relaxed = true) {
@@ -74,19 +71,18 @@ class TodayScreenViewModelTest {
                 PackageManager.PERMISSION_DENIED
         }
 
-        // Ensure getAllNotes() returns an empty flow so stateIn doesn't get null
         coEvery { mockPersonalRepo.getAllNotes() } returns emptyFlow()
         coEvery { mockWorkRepo.getAllNotes() } returns emptyFlow()
 
         startKoin {
             modules(module {
-                factory<TodayRepositoryImpl> { mockPersonalRepo }
-                factory<WorkTodayRepositoryImpl> { mockWorkRepo }
+                factory<TodayRepository> { mockPersonalRepo }
+                factory<WorkTodayRepository> { mockWorkRepo }
                 single { mockModeHolder }
             })
         }
 
-        viewModel = TodayScreenViewModel(mockApp)
+        viewModel = TodayScreenViewModelImpl(mockApp)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)

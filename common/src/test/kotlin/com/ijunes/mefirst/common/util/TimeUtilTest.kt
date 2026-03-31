@@ -1,12 +1,4 @@
-package com.ijunes.mefirst
-
-import com.ijunes.mefirst.common.util.toDateString
-import com.ijunes.mefirst.common.util.toTimeString
-import org.junit.Assert.assertEquals
-import org.junit.Test
-import java.util.Calendar
-import java.util.Locale
-import java.util.TimeZone
+package com.ijunes.mefirst.common.util
 
 class TimeUtilTest {
 

@@ -1,13 +1,11 @@
-package com.ijunes.mefirst
+package com.ijunes.mefirst.common.state
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.ijunes.mefirst.common.state.ModeStateHolder
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 
@@ -33,13 +31,13 @@ class ModeStateHolderTest {
 
     @Test
     fun `initial mode is personal (false) when no preference stored`() {
-        assertFalse(holder.isWorkMode.value)
+        Assert.assertFalse(holder.isWorkMode.value)
     }
 
     @Test
     fun `setWorkMode true updates StateFlow to true`() {
         holder.setWorkMode(true)
-        assertTrue(holder.isWorkMode.value)
+        Assert.assertTrue(holder.isWorkMode.value)
     }
 
     @Test
@@ -53,6 +51,6 @@ class ModeStateHolderTest {
     fun `initial mode is work when SharedPreferences returns true`() {
         every { mockPrefs.getBoolean("is_work_mode", false) } returns true
         val holderWithWorkMode = ModeStateHolder(mockContext)
-        assertTrue(holderWithWorkMode.isWorkMode.value)
+        Assert.assertTrue(holderWithWorkMode.isWorkMode.value)
     }
 }

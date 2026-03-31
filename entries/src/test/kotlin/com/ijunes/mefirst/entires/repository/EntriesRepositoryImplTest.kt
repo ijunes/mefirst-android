@@ -1,16 +1,11 @@
-package com.ijunes.mefirst
+package com.ijunes.mefirst.entires.repository
 
-import com.ijunes.mefirst.database.MeFirstDatabase
 import com.ijunes.mefirst.data.dao.EntriesDao
+import com.ijunes.mefirst.database.MeFirstDatabase
 import com.ijunes.mefirst.database.entity.EntryEntity
 import com.ijunes.mefirst.database.model.MediaType
 import com.ijunes.mefirst.entries.repository.EntriesRepositoryImpl
-import io.mockk.every
-import io.mockk.mockk
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertEquals
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import java.util.Calendar
@@ -25,7 +20,7 @@ class EntriesRepositoryImplTest {
     @Before
     fun setUp() {
         mockDao = mockk()
-        mockDb = mockk { every { entriesDao() } returns mockDao }
+        mockDb = mockk { every { MeFirstDatabase.entriesDao() } returns mockDao }
         repo = EntriesRepositoryImpl(mockDb)
     }
 
@@ -52,8 +47,8 @@ class EntriesRepositoryImplTest {
 
         val result = repo.getAllEntries().first()
 
-        assertEquals(1, result.size)
-        assertEquals(2, result.values.first().size)
+        Assert.assertEquals(1, result.size)
+        Assert.assertEquals(2, result.values.first().size)
     }
 
     @Test
@@ -64,7 +59,7 @@ class EntriesRepositoryImplTest {
 
         val result = repo.getAllEntries().first()
 
-        assertEquals(2, result.size)
+        Assert.assertEquals(2, result.size)
     }
 
     @Test
@@ -76,10 +71,10 @@ class EntriesRepositoryImplTest {
         val key = result.keys.first()
 
         val cal = Calendar.getInstance().apply { timeInMillis = key }
-        assertEquals(0, cal.get(Calendar.HOUR_OF_DAY))
-        assertEquals(0, cal.get(Calendar.MINUTE))
-        assertEquals(0, cal.get(Calendar.SECOND))
-        assertEquals(0, cal.get(Calendar.MILLISECOND))
+        Assert.assertEquals(0, cal.get(Calendar.HOUR_OF_DAY))
+        Assert.assertEquals(0, cal.get(Calendar.MINUTE))
+        Assert.assertEquals(0, cal.get(Calendar.SECOND))
+        Assert.assertEquals(0, cal.get(Calendar.MILLISECOND))
     }
 
     @Test
@@ -88,6 +83,6 @@ class EntriesRepositoryImplTest {
 
         val result = repo.getAllEntries().first()
 
-        assertEquals(emptyMap<Long, List<EntryEntity>>(), result)
+        Assert.assertEquals(emptyMap<Long, List<EntryEntity>>(), result)
     }
 }

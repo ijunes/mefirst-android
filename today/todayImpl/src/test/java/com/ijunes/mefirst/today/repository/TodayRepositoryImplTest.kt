@@ -1,20 +1,20 @@
-package com.ijunes.mefirst
+package com.ijunes.mefirst.today.repository
 
-import com.ijunes.mefirst.database.MeFirstDatabase
 import com.ijunes.mefirst.data.dao.EntriesDao
 import com.ijunes.mefirst.data.dao.TodayDao
+import com.ijunes.mefirst.database.MeFirstDatabase
 import com.ijunes.mefirst.database.entity.EntryEntity
-import com.ijunes.mefirst.database.model.MediaType
 import com.ijunes.mefirst.database.entity.NoteEntity
-import com.ijunes.today.data.repository.TodayRepositoryImpl
+import com.ijunes.mefirst.database.model.MediaType
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertEquals
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
+import kotlin.collections.addAll
 
 class TodayRepositoryImplTest {
 
@@ -57,10 +57,10 @@ class TodayRepositoryImplTest {
 
         repo.flushTodayEntries()
 
-        assertEquals(2, insertedEntries.size)
-        assertEquals(1000L, insertedEntries[0].timeStamp)
-        assertEquals("note 1", insertedEntries[0].text)
-        assertEquals(2000L, insertedEntries[1].timeStamp)
+        Assert.assertEquals(2, insertedEntries.size)
+        Assert.assertEquals(1000L, insertedEntries[0].timeStamp)
+        Assert.assertEquals("note 1", insertedEntries[0].text)
+        Assert.assertEquals(2000L, insertedEntries[1].timeStamp)
     }
 
     @Test
@@ -94,8 +94,8 @@ class TodayRepositoryImplTest {
         repo.flushTodayEntries()
 
         val entry = insertedEntries.single()
-        assertEquals(MediaType.VOICE, entry.mediaType)
-        assertEquals("file://audio.m4a", entry.mediaPath)
-        assertEquals("file://waveform.png", entry.waveformPath)
+        Assert.assertEquals(MediaType.VOICE, entry.mediaType)
+        Assert.assertEquals("file://audio.m4a", entry.mediaPath)
+        Assert.assertEquals("file://waveform.png", entry.waveformPath)
     }
 }

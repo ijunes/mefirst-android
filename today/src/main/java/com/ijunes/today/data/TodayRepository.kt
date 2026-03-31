@@ -3,12 +3,26 @@ package com.ijunes.today.data
 import com.ijunes.mefirst.database.entity.NoteEntity
 import kotlinx.coroutines.flow.Flow
 
+/**
+ * Data access contract for personal (non-work) notes.
+ *
+ * Implementations are provided by `:today:todayImpl` and bound via Koin in `:today:todayApp`.
+ */
 interface TodayRepository {
 
+    /**
+     * Returns a [Flow] that emits the full list of personal notes whenever the underlying data
+     * changes. The flow remains active for the lifetime of the collector.
+     */
     suspend fun getAllNotes(): Flow<List<NoteEntity>>
 
+    /** Persists a new personal [note] to the data store. */
     suspend fun insertNote(note: NoteEntity)
 
+    /**
+     * Deletes all personal notes that belong to the current day.
+     * Called by the midnight alarm scheduler to reset the feed at the configured flush time.
+     */
     suspend fun flushTodayEntries()
 
 }
