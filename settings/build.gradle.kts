@@ -44,4 +44,5 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.koin)
+    implementation(libs.firebase.appdistribution.api.ktx)
 }

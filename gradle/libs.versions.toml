@@ -7,6 +7,7 @@ constraintlayout-compose = "1.1.1"
 coreKtx = "1.18.0"
 coroutinesTest = "1.10.2"
 espressoCore = "3.7.0"
+firebaseAppdistributionApiKtx = "16.0.0-beta15"
 firebaseBom = "34.11.0"
 google-services = "4.4.4"
 junit = "4.13.2"
@@ -41,6 +42,7 @@ androidx-material3 = { group = "androidx.compose.material3", name = "material3",
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 constraintlayout-compose = { module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "constraintlayout-compose" }
+firebase-appdistribution-api-ktx = { module = "com.google.firebase:firebase-appdistribution-api-ktx", version.ref = "firebaseAppdistributionApiKtx" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 koin = { group = "io.insert-koin", name = "koin-android", version.ref = "koin" }

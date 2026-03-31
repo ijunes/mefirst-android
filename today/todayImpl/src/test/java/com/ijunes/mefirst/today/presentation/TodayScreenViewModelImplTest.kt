@@ -65,7 +65,7 @@ class TodayScreenViewModelImplTest {
             every { isWorkMode } returns modeFlow
         }
         mockApp = mockk(relaxed = true) {
-            every { filesDir } returns File(System.getProperty("java.io.tmpdir")!!)
+            every { filesDir } returns File(System.getProperty("kotlin.io.tmpdir")!!)
             every { packageName } returns "com.ijunes.mefirst"
             every { checkSelfPermission(Manifest.permission.RECORD_AUDIO) } returns
                 PackageManager.PERMISSION_DENIED
