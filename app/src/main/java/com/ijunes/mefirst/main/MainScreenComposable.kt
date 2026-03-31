@@ -22,6 +22,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.ijunes.mefirst.common.action.MainAction
 import com.ijunes.mefirst.entries.presentation.EntriesScreen
 import com.ijunes.mefirst.entries.presentation.EntriesScreenUiModel
 import com.ijunes.mefirst.settings.presentation.SettingsScreen
@@ -29,9 +30,8 @@ import com.ijunes.mefirst.main.components.ModeToggleAction
 import com.ijunes.mefirst.main.nav.MainScreenNavRoutes
 import com.ijunes.mefirst.main.nav.Route
 import com.ijunes.mefirst.main.nav.toNavItem
-import com.ijunes.mefirst.today.presentation.TodayScreen
-import com.ijunes.mefirst.today.presentation.TodayScreenUiModel
-
+import com.ijunes.today.presentation.TodayScreenProvider
+import com.ijunes.today.presentation.TodayScreenUiModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,6 +39,7 @@ fun MainScreen(
     navController: NavHostController,
     uiState: MainScreenUiState,
     onEvent: (MainAction) -> Unit,
+    todayScreenProvider: TodayScreenProvider,
 ) {
     val navItems = Route.entries.map {
         it.toNavItem(LocalContext.current)
@@ -91,13 +92,13 @@ fun MainScreen(
             modifier = Modifier.padding(contentPadding)
         ) {
             composable(MainScreenNavRoutes.Today.route.name) {
-                TodayScreen(
+                todayScreenProvider.Content(
                     uiModel = TodayScreenUiModel(messages = uiState.conversation),
                     isRecording = uiState.isRecording,
                     onChatSendClickListener = { onEvent(MainAction.SendChat(it)) },
                     onGalleryClickListener = { onEvent(MainAction.OpenGallery) },
                     onCameraClickListener = { onEvent(MainAction.OpenCamera) },
-                    contentPadding = contentPadding
+                    contentPadding = contentPadding,
                 )
             }
             composable(MainScreenNavRoutes.Entries.route.name) {

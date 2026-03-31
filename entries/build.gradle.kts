@@ -15,6 +15,9 @@ android {
     }
 
     buildTypes {
+        debug {
+            isMinifyEnabled = false
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(
@@ -35,6 +38,7 @@ android {
 dependencies {
     implementation(project(":database"))
     implementation(project(":common"))
+    implementation(project(":ui"))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

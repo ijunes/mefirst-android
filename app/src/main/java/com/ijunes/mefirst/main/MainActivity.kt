@@ -9,6 +9,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -23,18 +24,20 @@ import com.ijunes.mefirst.onboarding.presentation.OnboardingScreen
 import com.ijunes.mefirst.settings.pin.PinScreen
 import com.ijunes.mefirst.settings.domain.SettingsAction
 import com.ijunes.mefirst.settings.presentation.SettingsViewModel
-import com.ijunes.mefirst.today.presentation.TodayScreenViewModel
-import com.ijunes.mefirst.today.domain.TodayAction
 import com.ijunes.mefirst.ui.theme.AppTheme
+import com.ijunes.today.domain.TodayAction
+import com.ijunes.today.presentation.TodayScreenProvider
+import com.ijunes.today.presentation.TodayViewModel
 import kotlinx.coroutines.flow.combine
 import org.koin.android.ext.android.inject
 
 class MainActivity : ComponentActivity() {
 
-    private val todayVM: TodayScreenViewModel by viewModels()
+    private val todayVM: TodayViewModel by viewModel()
     private val entriesVM: EntriesScreenViewModel by viewModels()
     private val appModeVM: AppModeViewModel by viewModels()
     private val settingsVM: SettingsViewModel by viewModels()
+    private val todayScreenProvider: TodayScreenProvider by inject()
     private val onboardingStateHolder: OnboardingStateHolder by inject()
     private val settingsStateHolder: SettingsStateHolder by inject()
 
@@ -146,6 +149,7 @@ class MainActivity : ComponentActivity() {
                     navController = navHostController,
                     uiState = uiState,
                     onEvent = todayVM::handleEvent,
+                    todayScreenProvider = todayScreenProvider,
                 )
             }
         }

@@ -3,6 +3,7 @@ package com.ijunes.mefirst.entries.repository
 import com.ijunes.mefirst.database.MeFirstDatabase
 import com.ijunes.mefirst.database.entity.EntryEntity
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import java.util.Calendar
 
 interface EntriesRepository {

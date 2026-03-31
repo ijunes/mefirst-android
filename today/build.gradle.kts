@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.ijunes.mefirst.today"
+    namespace = "com.ijunes.today"
     compileSdk = 36
 
     defaultConfig {
@@ -15,6 +15,9 @@ android {
     }
 
     buildTypes {
+        debug {
+            isMinifyEnabled = false
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(
@@ -33,6 +36,7 @@ android {
 }
 
 dependencies {
+    api(libs.koin)
     implementation(project(":database"))
     implementation(project(":common"))
     implementation(libs.androidx.core.ktx)
@@ -48,7 +52,6 @@ dependencies {
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.coil.compose)
     implementation(libs.constraintlayout.compose)
-    implementation(libs.koin)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

@@ -15,6 +15,9 @@ android {
     }
 
     buildTypes {
+        debug {
+            isMinifyEnabled = false
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(
@@ -35,6 +38,6 @@ room {
 
 dependencies {
     api(libs.room.runtime)
-    implementation(libs.room.ktx)
+    api(libs.room.ktx)
     ksp(libs.room.compiler)
 }

@@ -23,6 +23,9 @@ android {
     }
 
     buildTypes {
+        debug {
+            isDebuggable = true
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(
@@ -58,6 +61,11 @@ dependencies {
     implementation(libs.koin)
     implementation(project(":database"))
     implementation(project(":today"))
+    implementation(project(":today:todayApp"))
+    implementation(project(":common"))
+    implementation(project(":entries"))
+    implementation(project(":ui"))
+    implementation(project(":settings"))
 
     testImplementation(libs.junit)
     testImplementation(libs.room.testing)

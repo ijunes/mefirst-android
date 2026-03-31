@@ -26,15 +26,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <receiver
-            android:name=".settings.alarm.receiver.MidnightFlushReceiver"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="com.ijunes.mefirst.ACTION_MIDNIGHT_FLUSH" />
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-        </receiver>
-        <provider
+<provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
             android:exported="false"

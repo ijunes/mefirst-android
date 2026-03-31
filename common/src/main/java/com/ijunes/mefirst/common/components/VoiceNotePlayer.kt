@@ -39,7 +39,7 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.ijunes.mefirst.R
+import com.ijunes.mefirst.common.R
 import kotlinx.coroutines.delay
 
 @Composable
