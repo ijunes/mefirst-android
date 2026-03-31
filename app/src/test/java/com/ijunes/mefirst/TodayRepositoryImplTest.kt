@@ -1,12 +1,12 @@
 package com.ijunes.mefirst
 
-import com.ijunes.mefirst.common.data.database.MeFirstDatabase
-import com.ijunes.mefirst.entries.data.EntriesDao
-import com.ijunes.mefirst.today.data.dao.TodayDao
-import com.ijunes.mefirst.entries.data.EntryEntity
-import com.ijunes.mefirst.common.data.model.MediaType
-import com.ijunes.mefirst.today.data.NoteEntity
-import com.ijunes.mefirst.today.data.repository.TodayRepositoryImpl
+import com.ijunes.mefirst.database.MeFirstDatabase
+import com.ijunes.mefirst.data.dao.EntriesDao
+import com.ijunes.mefirst.data.dao.TodayDao
+import com.ijunes.mefirst.database.entity.EntryEntity
+import com.ijunes.mefirst.database.model.MediaType
+import com.ijunes.mefirst.database.entity.NoteEntity
+import com.ijunes.today.data.repository.TodayRepositoryImpl
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify

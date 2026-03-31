@@ -20,7 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.ijunes.mefirst.common.data.model.MediaType
+import com.ijunes.mefirst.database.model.MediaType
 import com.ijunes.mefirst.common.data.MessageItem
 import com.ijunes.mefirst.common.components.VoiceNotePlayer
 import com.ijunes.mefirst.ui.theme.AppTheme

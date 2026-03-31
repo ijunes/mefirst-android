@@ -1,7 +1,7 @@
 package com.ijunes.mefirst.common.data
 
 import android.net.Uri
-import com.ijunes.mefirst.common.data.model.MediaType
+import com.ijunes.mefirst.database.model.MediaType
 
 data class MessageItem(
     val timeStamp: Long,

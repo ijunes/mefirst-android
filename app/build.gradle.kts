@@ -1,8 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
-    alias(libs.plugins.room)
-    alias(libs.plugins.ksp)
 }
 
 android {
@@ -43,10 +41,6 @@ android {
 
 }
 
-room {
-    schemaDirectory("$projectDir/schemas")
-}
-
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -62,10 +56,8 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.constraintlayout.compose)
     implementation(libs.koin)
-
-    implementation(libs.room.runtime)
-    implementation(libs.room.ktx)
-    ksp(libs.room.compiler)
+    implementation(project(":database"))
+    implementation(project(":today"))
 
     testImplementation(libs.junit)
     testImplementation(libs.room.testing)

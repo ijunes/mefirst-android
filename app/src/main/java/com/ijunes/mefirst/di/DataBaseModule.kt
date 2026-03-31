@@ -2,8 +2,8 @@ package com.ijunes.mefirst.di
 
 import android.app.Application
 import androidx.room.Room
-import com.ijunes.mefirst.common.data.database.MIGRATION_1_2
-import com.ijunes.mefirst.common.data.database.MeFirstDatabase
+import com.ijunes.mefirst.database.MIGRATION_1_2
+import com.ijunes.mefirst.database.MeFirstDatabase
 import org.koin.android.ext.koin.androidApplication
 import org.koin.dsl.module
 

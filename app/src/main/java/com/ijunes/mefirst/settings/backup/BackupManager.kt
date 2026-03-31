@@ -5,7 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Environment
 import android.os.Process
-import com.ijunes.mefirst.common.data.database.MeFirstDatabase
+import com.ijunes.mefirst.database.MeFirstDatabase
 import java.io.BufferedInputStream
 import java.io.BufferedOutputStream
 import java.io.File

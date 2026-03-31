@@ -37,7 +37,7 @@ import org.koin.dsl.module
 import java.io.File
 
 /**
- * Unit tests for [TodayScreenViewModel.handleEvent] dispatch logic.
+ * Unit tests for [com.ijunes.today.presentation.TodayScreenViewModel.handleEvent] dispatch logic.
  *
  * The ViewModel resolves its dependencies via KoinJavaComponent using the *concrete*
  * implementation class as the key, so each mock is registered in the test Koin module
