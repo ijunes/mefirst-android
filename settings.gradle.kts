@@ -26,3 +26,5 @@ rootProject.name = "MeFirst"
 include(":app")
 include(":today")
 include(":database")
+include(":common")
+include(":entries")

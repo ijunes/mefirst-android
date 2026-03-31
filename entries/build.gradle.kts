@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.ijunes.mefirst.today"
+    namespace = "com.ijunes.mefirst.entries"
     compileSdk = 36
 
     defaultConfig {

@@ -47,19 +47,18 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import coil.compose.AsyncImage
-import com.ijunes.mefirst.R
 import com.ijunes.mefirst.database.model.MediaType
 import com.ijunes.mefirst.common.data.MessageItem
 import com.ijunes.mefirst.common.components.VoiceNotePlayer
-import com.ijunes.mefirst.ui.theme.AppTheme
 import com.ijunes.mefirst.common.util.toDateString
 import com.ijunes.mefirst.common.util.toTimeString
+import com.ijunes.mefirst.today.R
 
 
 @Preview(showSystemUi = true)
 @Composable
 fun TodayScreenPreview() {
-    AppTheme {
+
         TodayScreen(
             uiModel = TodayScreenUiModel(
                 messages =
@@ -73,7 +72,7 @@ fun TodayScreenPreview() {
             onCameraClickListener = {},
             contentPadding = PaddingValues(0.dp)
         )
-    }
+
 }
 
 @Composable

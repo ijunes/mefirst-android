@@ -4,6 +4,4 @@
     <string name="nav_entries_label">Reflect</string>
     <string name="nav_settings_label">Settings</string>
 
-    <string name="today_personal_chat_placeholder">What\'s on your mind?</string>
-    <string name="today_work_chat_placeholder">What did you accomplish today?</string>
 </resources>

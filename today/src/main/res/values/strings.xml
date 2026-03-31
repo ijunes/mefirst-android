@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="today_personal_chat_placeholder">What\'s on your mind?</string>
+    <string name="today_work_chat_placeholder">What did you accomplish today?</string>
+</resources>
