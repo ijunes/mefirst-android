@@ -4,11 +4,12 @@ plugins {
 }
 
 android {
-    namespace = "com.ijunes.mefirst.entries"
+    namespace = "com.ijunes.mefirst.entries.impl"
     compileSdk = 36
 
     defaultConfig {
         minSdk = 24
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
@@ -34,9 +35,25 @@ android {
 dependencies {
     implementation(project(":database"))
     implementation(project(":common"))
+    implementation(project(":entries"))
+    implementation(project(":ui"))
     implementation(libs.koin)
+    implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)
+    implementation(libs.androidx.compose.ui.graphics)
+    implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.material3)
+    implementation(libs.androidx.compose.material.icons.extended)
+    implementation(libs.coil.compose)
+    implementation(libs.constraintlayout.compose)
+
+    testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.koin.test)
+    testImplementation(libs.mockk)
+    testImplementation(libs.room.testing)
 }

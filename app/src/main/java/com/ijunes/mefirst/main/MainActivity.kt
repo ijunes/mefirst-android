@@ -19,7 +19,8 @@ import androidx.compose.runtime.setValue
 import androidx.navigation.compose.rememberNavController
 import com.ijunes.mefirst.common.state.OnboardingStateHolder
 import com.ijunes.mefirst.common.state.SettingsStateHolder
-import com.ijunes.mefirst.entries.presentation.EntriesScreenViewModel
+import com.ijunes.entries.presentation.EntriesScreenProvider
+import com.ijunes.entries.presentation.EntriesViewModel
 import com.ijunes.mefirst.onboarding.presentation.OnboardingScreen
 import com.ijunes.mefirst.settings.pin.PinScreen
 import com.ijunes.mefirst.settings.domain.SettingsAction
@@ -34,10 +35,11 @@ import org.koin.android.ext.android.inject
 class MainActivity : ComponentActivity() {
 
     private val todayVM: TodayViewModel by viewModel()
-    private val entriesVM: EntriesScreenViewModel by viewModels()
+    private val entriesVM: EntriesViewModel by viewModel()
     private val appModeVM: AppModeViewModel by viewModels()
     private val settingsVM: SettingsViewModel by viewModels()
     private val todayScreenProvider: TodayScreenProvider by inject()
+    private val entriesScreenProvider: EntriesScreenProvider by inject()
     private val onboardingStateHolder: OnboardingStateHolder by inject()
     private val settingsStateHolder: SettingsStateHolder by inject()
 
@@ -150,6 +152,7 @@ class MainActivity : ComponentActivity() {
                     uiState = uiState,
                     onEvent = todayVM::handleEvent,
                     todayScreenProvider = todayScreenProvider,
+                    entriesScreenProvider = entriesScreenProvider,
                 )
             }
         }

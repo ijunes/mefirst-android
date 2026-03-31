@@ -1,29 +1,23 @@
 package com.ijunes.mefirst.entries.repository
 
+import com.ijunes.entries.data.WorkEntriesRepository
 import com.ijunes.mefirst.database.MeFirstDatabase
-import com.ijunes.mefirst.database.entity.EntryEntity
+import com.ijunes.mefirst.database.entity.WorkEntryEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.util.Calendar
 
-interface EntriesRepository {
-
-    suspend fun getAllEntriesByDate(startOfDay: Long, endOfDay: Long): Flow<List<EntryEntity>>
-
-    suspend fun getAllEntries(): Flow<Map<Long, List<EntryEntity>>>
-}
-
-class EntriesRepositoryImpl(private val database: MeFirstDatabase):EntriesRepository{
+class WorkEntriesRepositoryImpl(private val database: MeFirstDatabase) : WorkEntriesRepository {
 
     override suspend fun getAllEntriesByDate(
         startOfDay: Long,
         endOfDay: Long
-    ): Flow<List<EntryEntity>> {
-        return database.entriesDao().getEntriesByDate(startOfDay, endOfDay)
+    ): Flow<List<WorkEntryEntity>> {
+        return database.workEntriesDao().getEntriesByDate(startOfDay, endOfDay)
     }
 
-    override suspend fun getAllEntries(): Flow<Map<Long, List<EntryEntity>>> {
-        return database.entriesDao().getAllEntries().map { entries ->
+    override suspend fun getAllEntries(): Flow<Map<Long, List<WorkEntryEntity>>> {
+        return database.workEntriesDao().getAllEntries().map { entries ->
             entries.groupBy { entry ->
                 Calendar.getInstance().apply {
                     timeInMillis = entry.timeStamp
@@ -35,5 +29,4 @@ class EntriesRepositoryImpl(private val database: MeFirstDatabase):EntriesReposi
             }
         }
     }
-
 }

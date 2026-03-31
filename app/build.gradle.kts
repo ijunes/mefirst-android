@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -64,8 +65,10 @@ dependencies {
     implementation(project(":today:todayApp"))
     implementation(project(":common"))
     implementation(project(":entries"))
+    implementation(project(":entries:entriesApp"))
     implementation(project(":ui"))
     implementation(project(":settings"))
+    implementation(platform(libs.firebase.bom))
 
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

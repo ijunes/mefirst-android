@@ -1,10 +1,9 @@
-package com.ijunes.mefirst.entires.repository
+package com.ijunes.mefirst.entries.repository
 
 import com.ijunes.mefirst.data.dao.EntriesDao
 import com.ijunes.mefirst.database.MeFirstDatabase
 import com.ijunes.mefirst.database.entity.EntryEntity
 import com.ijunes.mefirst.database.model.MediaType
-import com.ijunes.mefirst.entries.repository.EntriesRepositoryImpl
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.flow.first

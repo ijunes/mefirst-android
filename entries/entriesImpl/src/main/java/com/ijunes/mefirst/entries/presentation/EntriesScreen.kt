@@ -26,10 +26,11 @@ import com.ijunes.mefirst.common.components.VoiceNotePlayer
 import com.ijunes.mefirst.ui.theme.AppTheme
 import com.ijunes.mefirst.common.util.toDateString
 import com.ijunes.mefirst.common.util.toTimeString
+import com.ijunes.entries.presentation.EntriesScreenUiModel
 
 @Preview
 @Composable
-fun EntriesScreenPreview(){
+fun EntriesScreenPreview() {
     AppTheme {
         EntriesScreen(
             uiModel = EntriesScreenUiModel(
@@ -38,7 +39,6 @@ fun EntriesScreenPreview(){
                         MessageItem(System.currentTimeMillis(), "Hello"),
                         MessageItem(System.currentTimeMillis() + 10000, "Hello"),
                         MessageItem(System.currentTimeMillis() + 20000, "Hello"),
-
                     ),
                     300000L to listOf(
                         MessageItem(System.currentTimeMillis(), "Hello"),
@@ -49,15 +49,13 @@ fun EntriesScreenPreview(){
             )
         )
     }
-
 }
 
 @Composable
 fun EntriesScreen(
     uiModel: EntriesScreenUiModel,
-    modifier: Modifier  = Modifier
+    modifier: Modifier = Modifier
 ) {
-
     LazyColumn(
         modifier = modifier.fillMaxSize(),
         verticalArrangement = spacedBy(8.dp)
@@ -67,21 +65,23 @@ fun EntriesScreen(
                 EntryComposable(entry.value.toEntryUiState(entry.key))
             }
         }
-
     }
 }
+
 private fun List<MessageItem>.toEntryUiState(date: Long): EntryUiState {
-    return EntryUiState(date.toDateString(),messages = this)
+    return EntryUiState(date.toDateString(), messages = this)
 }
+
 @Composable
 fun EntryComposable(
     entryUiState: EntryUiState,
     modifier: Modifier = Modifier
-){
+) {
     Card(
-        modifier = modifier.fillMaxSize()
-        .padding(8.dp)
-    ){
+        modifier = modifier
+            .fillMaxSize()
+            .padding(8.dp)
+    ) {
         Text(
             modifier = Modifier.padding(8.dp),
             text = entryUiState.date,
@@ -89,22 +89,21 @@ fun EntryComposable(
         )
         Column(
             modifier = Modifier
-            .fillMaxSize()
-            .padding(8.dp)
-        ){
+                .fillMaxSize()
+                .padding(8.dp)
+        ) {
             entryUiState.messages.forEach {
                 MessageComposable(it)
             }
         }
     }
-
 }
 
 @Composable
 fun MessageComposable(item: MessageItem) {
     Column(
         modifier = Modifier.fillMaxSize()
-    ){
+    ) {
         Text(
             text = item.timeStamp.toTimeString(),
             fontSize = MaterialTheme.typography.bodySmall.fontSize,

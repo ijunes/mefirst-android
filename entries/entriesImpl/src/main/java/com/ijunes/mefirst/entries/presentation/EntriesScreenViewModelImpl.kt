@@ -1,30 +1,27 @@
 package com.ijunes.mefirst.entries.presentation
 
 import androidx.core.net.toUri
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ijunes.mefirst.entries.repository.EntriesRepository
-import com.ijunes.mefirst.entries.repository.EntriesRepositoryImpl
-import com.ijunes.mefirst.common.state.ModeStateHolder
-import com.ijunes.mefirst.entries.repository.WorkEntriesRepository
-import com.ijunes.mefirst.entries.repository.WorkEntriesRepositoryImpl
+import com.ijunes.entries.data.EntriesRepository
+import com.ijunes.entries.data.WorkEntriesRepository
+import com.ijunes.entries.presentation.EntriesViewModel
 import com.ijunes.mefirst.common.data.MessageItem
+import com.ijunes.mefirst.common.state.ModeStateHolder
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import org.koin.java.KoinJavaComponent.inject
 
-class EntriesScreenViewModel : ViewModel() {
-
-    private val personalRepo: EntriesRepository by inject(EntriesRepositoryImpl::class.java)
-    private val workRepo: WorkEntriesRepository by inject(WorkEntriesRepositoryImpl::class.java)
-    private val modeHolder: ModeStateHolder by inject(ModeStateHolder::class.java)
+class EntriesScreenViewModelImpl(
+    private val personalRepo: EntriesRepository,
+    private val workRepo: WorkEntriesRepository,
+    private val modeHolder: ModeStateHolder,
+) : EntriesViewModel() {
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val entries: StateFlow<Map<Long, List<MessageItem>>> = modeHolder.isWorkMode
+    override val entries: StateFlow<Map<Long, List<MessageItem>>> = modeHolder.isWorkMode
         .flatMapLatest { isWork ->
             if (isWork) {
                 workRepo.getAllEntries().map { grouped ->

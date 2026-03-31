@@ -23,8 +23,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.ijunes.mefirst.common.action.MainAction
-import com.ijunes.mefirst.entries.presentation.EntriesScreen
-import com.ijunes.mefirst.entries.presentation.EntriesScreenUiModel
+import com.ijunes.entries.presentation.EntriesScreenProvider
+import com.ijunes.entries.presentation.EntriesScreenUiModel
 import com.ijunes.mefirst.settings.presentation.SettingsScreen
 import com.ijunes.mefirst.main.components.ModeToggleAction
 import com.ijunes.mefirst.main.nav.MainScreenNavRoutes
@@ -40,6 +40,7 @@ fun MainScreen(
     uiState: MainScreenUiState,
     onEvent: (MainAction) -> Unit,
     todayScreenProvider: TodayScreenProvider,
+    entriesScreenProvider: EntriesScreenProvider,
 ) {
     val navItems = Route.entries.map {
         it.toNavItem(LocalContext.current)
@@ -102,7 +103,7 @@ fun MainScreen(
                 )
             }
             composable(MainScreenNavRoutes.Entries.route.name) {
-                EntriesScreen(uiModel = EntriesScreenUiModel(entries = uiState.entries))
+                entriesScreenProvider.Content(uiModel = EntriesScreenUiModel(entries = uiState.entries))
             }
             composable(MainScreenNavRoutes.Settings.route.name) {
                 SettingsScreen()
