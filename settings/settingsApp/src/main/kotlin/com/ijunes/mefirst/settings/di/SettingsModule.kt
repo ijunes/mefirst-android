@@ -15,6 +15,6 @@ import org.koin.dsl.module
 val settingsModule = module {
     single<AlarmScheduler> { MidnightAlarmScheduler }
     single { BackupManager(androidContext(), get()) }
-    viewModel<SettingsViewModel> { SettingsViewModelImpl(androidApplication()) }
+    viewModel<SettingsViewModel> { SettingsViewModelImpl(androidApplication(), get(), get()) }
     single<SettingsScreenProvider> { SettingsScreenProviderImpl() }
 }

@@ -16,13 +16,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import org.koin.java.KoinJavaComponent.inject
 import androidx.lifecycle.viewModelScope
 
-class SettingsViewModelImpl(application: Application) : SettingsViewModel(application) {
-
-    private val settingsStateHolder: SettingsStateHolder by inject(SettingsStateHolder::class.java)
-    private val backupManager: BackupManager by inject(BackupManager::class.java)
+class SettingsViewModelImpl(
+    application: Application,
+    private val settingsStateHolder: SettingsStateHolder,
+    private val backupManager: BackupManager,
+) : SettingsViewModel(application) {
 
     private val _activityCommands = MutableSharedFlow<SettingsAction>(extraBufferCapacity = 1)
     override val actions: SharedFlow<SettingsAction> = _activityCommands.asSharedFlow()
