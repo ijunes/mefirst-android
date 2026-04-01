@@ -7,12 +7,7 @@ plugins {
 
 android {
     namespace = "com.ijunes.mefirst"
-
-    compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
-    }
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.ijunes.mefirst"
@@ -22,6 +17,18 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    signingConfigs {
+        create("release") {
+            // Reference properties file for security
+            storeFile = file(project.findProperty("RELEASE_STORE_FILE") as? String ?: "path/to/keystore.jks")
+            storePassword = project.findProperty("RELEASE_STORE_PASSWORD") as? String ?: ""
+            keyAlias = project.findProperty("RELEASE_KEY_ALIAS") as? String ?: ""
+            keyPassword = project.findProperty("RELEASE_KEY_PASSWORD") as? String ?: ""
+            enableV1Signing = true
+            enableV2Signing = true
+        }
     }
 
     buildTypes {
@@ -34,6 +41,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("release")
         }
     }
     compileOptions {
@@ -43,7 +51,6 @@ android {
     buildFeatures {
         compose = true
     }
-
 }
 
 dependencies {
