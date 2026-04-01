@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.ijunes.entries.data.EntriesRepository
 import com.ijunes.entries.data.WorkEntriesRepository
 import com.ijunes.entries.presentation.EntriesViewModel
-import com.ijunes.mefirst.common.data.MessageItem
+import com.ijunes.mefirst.common.data.Message
 import com.ijunes.mefirst.common.state.ModeStateHolder
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
@@ -21,13 +21,13 @@ class EntriesScreenViewModelImpl(
 ) : EntriesViewModel() {
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    override val entries: StateFlow<Map<Long, List<MessageItem>>> = modeHolder.isWorkMode
+    override val entries: StateFlow<Map<Long, List<Message>>> = modeHolder.isWorkMode
         .flatMapLatest { isWork ->
             if (isWork) {
                 workRepo.getAllEntries().map { grouped ->
                     grouped.mapValues { (_, dayEntries) ->
                         dayEntries.map {
-                            MessageItem(
+                            Message(
                                 timeStamp = it.timeStamp,
                                 text = it.text,
                                 mediaType = it.mediaType,
@@ -41,7 +41,7 @@ class EntriesScreenViewModelImpl(
                 personalRepo.getAllEntries().map { grouped ->
                     grouped.mapValues { (_, dayEntries) ->
                         dayEntries.map {
-                            MessageItem(
+                            Message(
                                 timeStamp = it.timeStamp,
                                 text = it.text,
                                 mediaType = it.mediaType,

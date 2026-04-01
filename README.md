@@ -22,9 +22,9 @@ Personal Mode  |  Work Mode    | Settings
 
 | Layer | Technology |
 |---|---|
-| Language | Kotlin |
+| Language | Kotlin 2.3.20 |
 | UI | Jetpack Compose + Material3 |
-| Architecture | MVVM + Clean Architecture |
+| Architecture | MVVM + Clean Architecture (multi-module) |
 | Database | Room 2.8.4 (KSP) |
 | Dependency Injection | Koin 4.2.0 |
 | Image loading | Coil 2.7.0 |
@@ -35,7 +35,7 @@ Personal Mode  |  Work Mode    | Settings
 
 ## Architecture
 
-The app uses **MVVM + Clean Architecture** with reactive Kotlin Flows.
+The app uses **MVVM + Clean Architecture** with reactive Kotlin Flows, organized into feature modules.
 
 ```
 ModeStateHolder.isWorkMode (StateFlow<Boolean>)
@@ -48,18 +48,18 @@ Composable via collectAsState()
 
 ### Layers
 
-- **UI** (`ui/`) — Composable screens and ViewModels. Side-effects like camera and permissions are dispatched via `MutableSharedFlow<ActivityCommand>` and handled in `MainActivity`.
+- **UI** — Composable screens and ViewModels per feature module. Side-effects like camera and permissions are dispatched via `MutableSharedFlow<MainAction>` and handled in `MainActivity`.
 - **Domain** — Repository interfaces + `ModeStateHolder`, the single source of truth for the personal/work mode toggle (backed by SharedPreferences).
-- **Data** (`data/`) — Room DAOs with entity↔model mapping. Separate tables exist for each mode: `NoteEntity`/`WorkNoteEntity` and `EntryEntity`/`WorkEntryEntity`.
-- **DI** (`di/`) — Koin modules: `DataBaseModule`, `RepositoryModule`.
+- **Data** — Room DAOs with entity↔model mapping. Separate tables exist for each mode: `NoteEntity`/`WorkTodayEntity` and `EntryEntity`/`WorkEntryEntity`.
+- **DI** — Koin modules per feature, aggregated in the `:app` module.
 
 ### Key Design Decisions
 
 **Dual-mode data flow**: All DB queries use `flatMapLatest` on `ModeStateHolder.isWorkMode`, so switching modes instantly swaps the data source with no UI re-query needed.
 
-**Unified event handling**: All UI interactions are expressed as a `MainEvent` sealed interface and routed through `ViewModel.handleEvent()`, keeping event logic centralized.
+**Unified event handling**: All UI interactions are expressed as a sealed interface (e.g., `TodayAction`, `SettingsAction`) and routed through `ViewModel.handleEvent()`, keeping event logic centralized.
 
-**Midnight flush**: `MidnightAlarmScheduler` schedules a repeating alarm; the `BroadcastReceiver` calls `flushTodayEntries()` to bulk-move today's notes into the entries table.
+**Midnight flush**: `MidnightAlarmScheduler` schedules a repeating alarm; `TimeFlushReceiver` calls `flushTodayEntries()` to bulk-move today's notes into the entries table.
 
 **Voice waveform rendering**: `MediaRecorder` samples amplitude every 100ms during recording; the waveform bitmap is rendered when recording stops.
 
@@ -84,7 +84,7 @@ Requirements: Android Studio, JDK 17+, Android SDK.
 ./gradlew test
 
 # Run a single test class
-./gradlew test --tests "com.ijunes.mefirst.TodayScreenViewModelTest"
+./gradlew :today:todayImpl:test --tests "com.ijunes.mefirst.today.TodayScreenViewModelTest"
 
 # Run instrumented tests (requires a connected device)
 ./gradlew connectedAndroidTest
@@ -94,14 +94,48 @@ Requirements: Android Studio, JDK 17+, Android SDK.
 
 ## Project Structure
 
-```
-app/src/main/java/com/ijunes/mefirst/
-├── ui/                  # Composable screens + ViewModels
-├── data/                # Room entities, DAOs, repository implementations
-├── domain/              # Repository interfaces, ModeStateHolder
-├── di/                  # Koin DI modules
-└── MainActivity.kt      # Activity + ActivityCommand handler
+The project is organized as a multi-module Gradle build. Feature modules follow a split pattern: a public API module and a private implementation module.
 
-app/src/test/            # Unit tests (MockK + UnconfinedTestDispatcher)
-gradle/libs.versions.toml  # Version catalog
+```
+mefirst-android/
+├── app/                        # Application shell: MainActivity, navigation, top-level DI
+│   └── src/main/kotlin/.../
+│       ├── di/                 # Koin modules (database, repository, datastore, workers)
+│       ├── main/               # MainActivity, MainScreenComposable, AppModeViewModel
+│       └── onboarding/         # Onboarding screen
+│
+├── database/                   # Room database: entities, DAOs, type converters
+│   └── src/main/kotlin/.../
+│       ├── entity/             # NoteEntity, WorkTodayEntity, EntryEntity, WorkEntryEntity
+│       ├── dao/                # TodayDao, WorkTodayDao, EntriesDao, WorkEntriesDao
+│       └── converter/          # Room type converters
+│
+├── common/                     # Shared code used across feature modules
+│   └── src/main/kotlin/.../
+│       ├── state/              # ModeStateHolder (personal/work mode toggle)
+│       ├── components/         # Shared UI components (e.g., VoiceNotePlayer)
+│       ├── action/             # MainAction sealed interface
+│       ├── data/               # MessageItem data class
+│       └── util/               # Utility functions (TimeUtil, etc.)
+│
+├── ui/                         # Design system: Material3 theme, colors, typography
+│
+├── today/                      # "Today" feature — daily note capture
+│   ├── src/                    # Public API: repository interfaces, ViewModel, UiModel
+│   ├── todayImpl/              # Implementation: Room-backed repos, TodayScreen composable
+│   └── todayApp/               # App-level wiring for the today feature
+│
+├── entries/                    # "Entries" feature — historical entries archive
+│   ├── src/                    # Public API: repository interfaces, ViewModel, UiModel
+│   ├── entriesImpl/            # Implementation: Room-backed repos, EntriesScreen composable
+│   └── entriesApp/             # App-level wiring for the entries feature
+│
+├── settings/                   # Settings feature
+│   └── src/main/kotlin/.../
+│       ├── alarm/              # MidnightAlarmScheduler, TimeFlushReceiver
+│       ├── backup/             # BackupManager
+│       ├── pin/                # PIN authentication screen
+│       └── presentation/       # SettingsScreen, SettingsViewModel, SettingsUiState
+│
+gradle/libs.versions.toml       # Version catalog
 ```

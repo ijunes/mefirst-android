@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.ijunes.mefirst.settings"
+    namespace = "com.ijunes.mefirst.settings.impl"
     compileSdk = 36
 
     defaultConfig {
@@ -33,9 +33,17 @@ android {
 }
 
 dependencies {
+    implementation(project(":database"))
+    implementation(project(":common"))
+    implementation(project(":today"))
+    implementation(project(":settings"))
+    implementation(libs.koin)
+    implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.material.icons.extended)
+    implementation(libs.firebase.appdistribution.api.ktx)
 }

@@ -3,6 +3,6 @@
     <string name="nav_today_label">Today</string>
     <string name="nav_entries_label">Reflect</string>
     <string name="nav_settings_label">Settings</string>
-    <string name="mode_personal">Personal</string>
+    <string name="mode_personal">Me</string>
     <string name="mode_work">Work</string>
 </resources>

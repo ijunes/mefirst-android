@@ -24,6 +24,7 @@ import com.ijunes.entries.presentation.EntriesViewModel
 import com.ijunes.mefirst.onboarding.presentation.OnboardingScreen
 import com.ijunes.mefirst.settings.pin.PinScreen
 import com.ijunes.mefirst.settings.domain.SettingsAction
+import com.ijunes.mefirst.settings.presentation.SettingsScreenProvider
 import com.ijunes.mefirst.settings.presentation.SettingsViewModel
 import com.ijunes.mefirst.ui.theme.AppTheme
 import com.ijunes.today.domain.TodayAction
@@ -37,9 +38,10 @@ class MainActivity : ComponentActivity() {
     private val todayVM: TodayViewModel by viewModel()
     private val entriesVM: EntriesViewModel by viewModel()
     private val appModeVM: AppModeViewModel by viewModels()
-    private val settingsVM: SettingsViewModel by viewModels()
+    private val settingsVM: SettingsViewModel by viewModel()
     private val todayScreenProvider: TodayScreenProvider by inject()
     private val entriesScreenProvider: EntriesScreenProvider by inject()
+    private val settingsScreenProvider: SettingsScreenProvider by inject()
     private val onboardingStateHolder: OnboardingStateHolder by inject()
     private val settingsStateHolder: SettingsStateHolder by inject()
 
@@ -153,6 +155,8 @@ class MainActivity : ComponentActivity() {
                     onEvent = todayVM::handleEvent,
                     todayScreenProvider = todayScreenProvider,
                     entriesScreenProvider = entriesScreenProvider,
+                    settingsScreenProvider = settingsScreenProvider,
+                    settingsViewModel = settingsVM,
                 )
             }
         }

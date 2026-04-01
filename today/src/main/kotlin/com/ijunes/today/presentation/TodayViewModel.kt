@@ -4,7 +4,7 @@ import android.app.Application
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import com.ijunes.mefirst.common.action.MainAction
-import com.ijunes.mefirst.common.data.MessageItem
+import com.ijunes.mefirst.common.data.Message
 import com.ijunes.today.domain.TodayAction
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -23,7 +23,7 @@ abstract class TodayViewModel(application: Application) : AndroidViewModel(appli
      * The ordered list of notes for the active mode (personal or work), emitted whenever the
      * underlying data changes. Switches its source automatically when the user toggles work mode.
      */
-    abstract val conversation: StateFlow<List<MessageItem>>
+    abstract val conversation: StateFlow<List<Message>>
 
     /** Whether a voice recording is currently in progress. */
     abstract val isRecording: StateFlow<Boolean>

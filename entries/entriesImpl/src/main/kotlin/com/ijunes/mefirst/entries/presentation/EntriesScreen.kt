@@ -21,7 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.ijunes.mefirst.database.model.MediaType
-import com.ijunes.mefirst.common.data.MessageItem
+import com.ijunes.mefirst.common.data.Message
 import com.ijunes.mefirst.common.components.VoiceNotePlayer
 import com.ijunes.mefirst.ui.theme.AppTheme
 import com.ijunes.mefirst.common.util.toDateString
@@ -36,14 +36,14 @@ fun EntriesScreenPreview() {
             uiModel = EntriesScreenUiModel(
                 entries = mapOf(
                     100000L to listOf(
-                        MessageItem(System.currentTimeMillis(), "Hello"),
-                        MessageItem(System.currentTimeMillis() + 10000, "Hello"),
-                        MessageItem(System.currentTimeMillis() + 20000, "Hello"),
+                        Message(System.currentTimeMillis(), "Hello"),
+                        Message(System.currentTimeMillis() + 10000, "Hello"),
+                        Message(System.currentTimeMillis() + 20000, "Hello"),
                     ),
                     300000L to listOf(
-                        MessageItem(System.currentTimeMillis(), "Hello"),
-                        MessageItem(System.currentTimeMillis() + 10000, "Hello"),
-                        MessageItem(System.currentTimeMillis() + 20000, "Hello"),
+                        Message(System.currentTimeMillis(), "Hello"),
+                        Message(System.currentTimeMillis() + 10000, "Hello"),
+                        Message(System.currentTimeMillis() + 20000, "Hello"),
                     )
                 )
             )
@@ -68,7 +68,7 @@ fun EntriesScreen(
     }
 }
 
-private fun List<MessageItem>.toEntryUiState(date: Long): EntryUiState {
+private fun List<Message>.toEntryUiState(date: Long): EntryUiState {
     return EntryUiState(date.toDateString(), messages = this)
 }
 
@@ -100,7 +100,7 @@ fun EntryComposable(
 }
 
 @Composable
-fun MessageComposable(item: MessageItem) {
+fun MessageComposable(item: Message) {
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -127,5 +127,5 @@ fun MessageComposable(item: MessageItem) {
 
 data class EntryUiState(
     val date: String,
-    @Stable val messages: List<MessageItem>
+    @Stable val messages: List<Message>
 )

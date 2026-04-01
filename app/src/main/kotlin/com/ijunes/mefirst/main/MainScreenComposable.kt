@@ -25,8 +25,9 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.ijunes.mefirst.common.action.MainAction
 import com.ijunes.entries.presentation.EntriesScreenProvider
 import com.ijunes.entries.presentation.EntriesScreenUiModel
-import com.ijunes.mefirst.settings.presentation.SettingsScreen
-import com.ijunes.mefirst.main.components.ModeToggleAction
+import com.ijunes.mefirst.settings.presentation.SettingsScreenProvider
+import com.ijunes.mefirst.settings.presentation.SettingsViewModel
+import com.ijunes.mefirst.main.components.SegmentedModeSelector
 import com.ijunes.mefirst.main.nav.MainScreenNavRoutes
 import com.ijunes.mefirst.main.nav.Route
 import com.ijunes.mefirst.main.nav.toNavItem
@@ -41,6 +42,8 @@ fun MainScreen(
     onEvent: (MainAction) -> Unit,
     todayScreenProvider: TodayScreenProvider,
     entriesScreenProvider: EntriesScreenProvider,
+    settingsScreenProvider: SettingsScreenProvider,
+    settingsViewModel: SettingsViewModel,
 ) {
     val navItems = Route.entries.map {
         it.toNavItem(LocalContext.current)
@@ -61,9 +64,7 @@ fun MainScreen(
                     Text("MeFirst")
                 },
                 actions = {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        ModeToggleAction(uiState.isWorkMode) { onEvent(MainAction.SetWorkMode(it)) }
-                    }
+                    SegmentedModeSelector(uiState.isWorkMode) { onEvent(MainAction.SetWorkMode(it)) }
                 }
             )
         },
@@ -106,7 +107,7 @@ fun MainScreen(
                 entriesScreenProvider.Content(uiModel = EntriesScreenUiModel(entries = uiState.entries))
             }
             composable(MainScreenNavRoutes.Settings.route.name) {
-                SettingsScreen()
+                settingsScreenProvider.Content(viewModel = settingsViewModel)
             }
         }
     }

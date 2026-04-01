@@ -63,6 +63,7 @@ dependencies {
     implementation(project(":entries:entriesApp"))
     implementation(project(":ui"))
     implementation(project(":settings"))
+    implementation(project(":settings:settingsApp"))
     implementation(platform(libs.firebase.bom))
 
     androidTestImplementation(libs.androidx.junit)

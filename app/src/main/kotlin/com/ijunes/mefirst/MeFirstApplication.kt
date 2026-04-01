@@ -1,7 +1,7 @@
 package com.ijunes.mefirst
 
 import android.app.Application
-import com.ijunes.mefirst.settings.alarm.MidnightAlarmScheduler
+import com.ijunes.mefirst.settings.alarm.AlarmScheduler
 import com.ijunes.mefirst.common.state.SettingsStateHolder
 import com.ijunes.mefirst.di.databaseModule
 import com.ijunes.mefirst.di.repositoryModule
@@ -23,6 +23,7 @@ class MeFirstApplication: Application() {
             modules(databaseModule, repositoryModule, todayModule, entriesModule, settingsModule)
         }
         val settings: SettingsStateHolder = get()
-        MidnightAlarmScheduler.schedule(this, settings.flushHour.value, settings.flushMinute.value)
+        val alarmScheduler: AlarmScheduler = get()
+        alarmScheduler.schedule(this, settings.flushHour.value, settings.flushMinute.value)
     }
 }

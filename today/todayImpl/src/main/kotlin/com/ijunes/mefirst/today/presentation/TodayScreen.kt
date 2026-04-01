@@ -2,8 +2,7 @@ package com.ijunes.mefirst.today.presentation
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
+
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.consumeWindowInsets
@@ -37,7 +36,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.input.TextFieldValue
@@ -46,13 +44,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import coil.compose.AsyncImage
-import com.ijunes.mefirst.database.model.MediaType
-import com.ijunes.mefirst.common.data.MessageItem
-import com.ijunes.mefirst.common.components.VoiceNotePlayer
+import com.ijunes.mefirst.common.data.Message
 import com.ijunes.mefirst.common.util.toDateString
-import com.ijunes.mefirst.common.util.toTimeString
 import com.ijunes.mefirst.today.impl.R
+import com.ijunes.mefirst.today.presentation.components.MessageItem
 import com.ijunes.today.presentation.TodayScreenUiModel
 
 
@@ -64,7 +59,7 @@ fun TodayScreenPreview() {
             uiModel = TodayScreenUiModel(
                 messages =
                     listOf(
-                        MessageItem(timeStamp = System.currentTimeMillis(), text = "Hello")
+                        Message(timeStamp = System.currentTimeMillis(), text = "Hello")
                     )
             ),
             isRecording = false,
@@ -135,55 +130,6 @@ fun TodayScreen(
                     end.linkTo(parent.end)
                 }
         )
-    }
-}
-
-@Composable
-fun MessageItem(
-    modifier: Modifier = Modifier,
-    message: MessageItem
-) {
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(4.dp)
-    ) {
-        Box(
-            modifier = Modifier
-                .align(Alignment.End)
-                .clip(
-                    RoundedCornerShape(
-                        topStart = 48f,
-                        topEnd = 48f,
-                        bottomStart = 48f,
-                        bottomEnd = 0f
-                    )
-                )
-                .background(MaterialTheme.colorScheme.onBackground)
-                .padding(16.dp)
-        ) {
-            when (message.mediaType) {
-                MediaType.VOICE -> VoiceNotePlayer(uri = message.mediaPath, waveformUri = message.waveformPath)
-                MediaType.IMAGE -> AsyncImage(
-                    model = message.mediaPath,
-                    contentDescription = "Image attachment",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(8.dp))
-                        .fillMaxSize(0.5f)
-                )
-                else -> message.text?.let {
-                    Text(
-                        text = it,
-                        color = MaterialTheme.colorScheme.primaryContainer
-                    )
-                }
-            }
-        }
-        Text(
-            text = message.timeStamp.toTimeString(),
-            fontSize = MaterialTheme.typography.bodySmall.fontSize,
-            modifier = Modifier.align(Alignment.End))
     }
 }
 

@@ -8,11 +8,11 @@ import android.os.Build
 import com.ijunes.mefirst.settings.alarm.receiver.TimeFlushReceiver
 import java.util.Calendar
 
-object MidnightAlarmScheduler {
+object MidnightAlarmScheduler : AlarmScheduler {
 
     const val ACTION_MIDNIGHT_FLUSH = "com.ijunes.mefirst.ACTION_MIDNIGHT_FLUSH"
 
-    fun schedule(context: Context, hour: Int = 0, minute: Int = 0) {
+    override fun schedule(context: Context, hour: Int, minute: Int) {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val pendingIntent = buildPendingIntent(context)
         val triggerAt = nextFlushMillis(hour, minute)

@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -35,20 +36,19 @@ import com.ijunes.mefirst.ui.theme.AppTheme
 @Composable
 fun SegmentedModeSelector(
     isWorkMode: Boolean,
-    onModeChanged: (Boolean) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onModeChanged: (Boolean) -> Unit
 ) {
     val containerColor = Color(0xFFF1F4FF)
-    val personalSelectedColor = Color(0xFFFFA585)
-    val workSelectedColor = Color(0xFFB7E4C7)
     val selectedContentColor = Color(0xFF5A4035)
     val unselectedContentColor = Color(0xFF9EA7D0)
 
     Row(
         modifier = modifier
+            .fillMaxWidth(0.5f)
             .clip(RoundedCornerShape(32.dp))
             .background(containerColor)
-            .padding(4.dp),
+            .padding(2.dp),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -56,7 +56,7 @@ fun SegmentedModeSelector(
             text = stringResource(R.string.mode_personal),
             iconRes = R.drawable.ic_personal,
             isSelected = !isWorkMode,
-            selectedColor = personalSelectedColor,
+            selectedColor = MaterialTheme.colorScheme.primaryContainer,
             selectedContentColor = selectedContentColor,
             unselectedContentColor = unselectedContentColor,
             onClick = { onModeChanged(false) },
@@ -67,7 +67,7 @@ fun SegmentedModeSelector(
             text = stringResource(R.string.mode_work),
             iconRes = R.drawable.ic_work,
             isSelected = isWorkMode,
-            selectedColor = workSelectedColor,
+            selectedColor = MaterialTheme.colorScheme.primaryContainer,
             selectedContentColor = selectedContentColor,
             unselectedContentColor = unselectedContentColor,
             onClick = { onModeChanged(true) },
@@ -105,7 +105,7 @@ private fun ModeSegment(
                 indication = null,
                 onClick = onClick
             )
-            .padding(vertical = 10.dp),
+            .padding(vertical = 6.dp, horizontal = 4.dp),
         contentAlignment = Alignment.Center
     ) {
         Row(
@@ -116,16 +116,17 @@ private fun ModeSegment(
                 Icon(
                     painter = painterResource(id = iconRes),
                     contentDescription = null,
-                    modifier = Modifier.size(24.dp),
+                    modifier = Modifier.size(18.dp),
                     tint = contentColor
                 )
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(6.dp))
             }
             Text(
                 text = text,
                 color = contentColor,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1
             )
         }
     }
@@ -138,8 +139,7 @@ fun SegmentedModeSelectorPreview() {
         Box(modifier = Modifier.padding(16.dp)) {
             SegmentedModeSelector(
                 isWorkMode = false,
-                onModeChanged = {},
-                modifier = Modifier.fillMaxWidth()
+                onModeChanged = {}
             )
         }
     }
@@ -152,8 +152,7 @@ fun SegmentedModeSelectorWorkPreview() {
         Box(modifier = Modifier.padding(16.dp)) {
             SegmentedModeSelector(
                 isWorkMode = true,
-                onModeChanged = {},
-                modifier = Modifier.fillMaxWidth()
+                onModeChanged = {}
             )
         }
     }

@@ -1,6 +1,6 @@
 package com.ijunes.today.presentation
 
-import com.ijunes.mefirst.common.data.MessageItem
+import com.ijunes.mefirst.common.data.Message
 
 /**
  * UI state passed to [TodayScreenProvider.Content].
@@ -10,5 +10,5 @@ import com.ijunes.mefirst.common.data.MessageItem
  * or an image attachment.
  */
 data class TodayScreenUiModel(
-    val messages: List<MessageItem>
+    val messages: List<Message>
 )

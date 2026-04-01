@@ -19,7 +19,7 @@ import com.ijunes.mefirst.database.model.MediaType
 import com.ijunes.mefirst.database.entity.NoteEntity
 import com.ijunes.mefirst.database.entity.WorkTodayEntity
 import com.ijunes.mefirst.common.state.ModeStateHolder
-import com.ijunes.mefirst.common.data.MessageItem
+import com.ijunes.mefirst.common.data.Message
 import com.ijunes.today.domain.TodayAction
 import com.ijunes.today.presentation.TodayViewModel
 import kotlinx.coroutines.Dispatchers
@@ -52,12 +52,12 @@ class TodayScreenViewModelImpl(application: Application) : TodayViewModel(applic
     private val modeHolder: ModeStateHolder by inject(ModeStateHolder::class.java)
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    override val conversation: StateFlow<List<MessageItem>> = modeHolder.isWorkMode
+    override val conversation: StateFlow<List<Message>> = modeHolder.isWorkMode
         .flatMapLatest { isWork ->
             if (isWork) {
                 workRepo.getAllNotes().map { notes ->
                     notes.map {
-                        MessageItem(
+                        Message(
                             text = it.noteText ?: "",
                             mediaType = it.mediaType,
                             timeStamp = it.timeStamp,
@@ -69,7 +69,7 @@ class TodayScreenViewModelImpl(application: Application) : TodayViewModel(applic
             } else {
                 personalRepo.getAllNotes().map { notes ->
                     notes.map {
-                        MessageItem(
+                        Message(
                             text = it.noteText ?: "",
                             mediaType = it.mediaType,
                             timeStamp = it.timeStamp,
