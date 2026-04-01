@@ -1,5 +1,6 @@
 package com.ijunes.mefirst.today.presentation.components
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
@@ -82,7 +83,7 @@ fun MessageItem(
                 }
             }
         }
-        if (showMoreOptions) {
+        AnimatedVisibility(showMoreOptions) {
             Row(
                 modifier = Modifier
                     .align(Alignment.End)
