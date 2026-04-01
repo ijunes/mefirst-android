@@ -5,9 +5,8 @@ import com.ijunes.mefirst.database.entity.WorkEntryEntity
 import com.ijunes.mefirst.database.entity.WorkTodayEntity
 import com.ijunes.today.data.WorkTodayRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-
-import kotlin.collections.map
 
 class WorkTodayRepositoryImpl(private val database: MeFirstDatabase) : WorkTodayRepository {
 
@@ -20,20 +19,17 @@ class WorkTodayRepositoryImpl(private val database: MeFirstDatabase) : WorkToday
     }
 
     override suspend fun flushTodayEntries() {
-        database.workTodayDao().getAll().map { noteList ->
-            noteList.map { note ->
-                WorkEntryEntity(
-                    timeStamp = note.timeStamp,
-                    text = note.noteText,
-                    mediaType = note.mediaType,
-                    mediaPath = note.mediaPath,
-                    waveformPath = note.waveformPath
-                )
-            }
-        }.collect { entryList ->
-            database.workEntriesDao().addAllNoteEntries(*entryList.toTypedArray())
-            database.workTodayDao().deleteAll()
+        val entryList = database.workTodayDao().getAll().first().map { note ->
+            WorkEntryEntity(
+                timeStamp = note.timeStamp,
+                text = note.noteText,
+                mediaType = note.mediaType,
+                mediaPath = note.mediaPath,
+                waveformPath = note.waveformPath
+            )
         }
+        database.workEntriesDao().addAllNoteEntries(*entryList.toTypedArray())
+        database.workTodayDao().deleteAll()
     }
 
     override suspend fun deleteTodayNote(timestamp: Long) {
