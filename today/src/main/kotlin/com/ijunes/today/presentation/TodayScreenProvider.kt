@@ -2,6 +2,7 @@ package com.ijunes.today.presentation
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
+import com.ijunes.mefirst.common.data.Message
 
 /**
  * Composable contract for rendering the Today screen.
@@ -22,6 +23,7 @@ interface TodayScreenProvider {
      * field value, which may be empty (indicating a voice recording toggle).
      * @param onGalleryClickListener Invoked when the user taps the gallery attachment button.
      * @param onCameraClickListener Invoked when the user taps the camera attachment button.
+     * @param onDeleteMessage Callback invoked when user taps the delete button on a message after long press.
      * @param contentPadding Insets from the parent [androidx.compose.material3.Scaffold] that
      * the screen must respect to avoid being obscured by system bars.
      */
@@ -33,6 +35,7 @@ interface TodayScreenProvider {
         onGalleryClickListener: () -> Unit,
         onCameraClickListener: () -> Unit,
         onClearPendingImageListener: () -> Unit,
+        onDeleteMessage: (Message) -> Unit,
         contentPadding: PaddingValues,
     )
 }

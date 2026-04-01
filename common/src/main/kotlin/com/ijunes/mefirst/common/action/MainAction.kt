@@ -1,5 +1,7 @@
 package com.ijunes.mefirst.common.action
 
+import com.ijunes.mefirst.common.data.Message
+
 /**
  * User-initiated actions that originate from the Today screen and are dispatched to
  * [com.ijunes.today.presentation.TodayViewModel.handleEvent].
@@ -40,4 +42,11 @@ sealed interface MainAction {
      * @property isWork `true` to switch to work mode, `false` for personal mode.
      */
     data class SetWorkMode(val isWork: Boolean) : MainAction
+
+    /**
+     * The user tapped the delete button on a message.
+     *
+     * @property message The message to delete.
+     */
+    data class DeleteMessage(val message: Message) : MainAction
 }

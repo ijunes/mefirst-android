@@ -73,6 +73,7 @@ fun TodayScreenPreview() {
             onGalleryClickListener = {},
             onCameraClickListener = {},
             onClearPendingImageListener = {},
+            onDeleteMessage = {},
             contentPadding = PaddingValues(0.dp)
         )
 
@@ -105,6 +106,7 @@ fun TodayScreen(
     onGalleryClickListener: () -> Unit,
     onCameraClickListener: () -> Unit,
     onClearPendingImageListener: () -> Unit,
+    onDeleteMessage: (Message) -> Unit,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
 ) {
@@ -140,7 +142,9 @@ fun TodayScreen(
             contentPadding = PaddingValues(16.dp)
         ) {
             items(uiModel.messages) { item ->
-                MessageItem(message = item)
+                MessageItem(message = item) {
+                    onDeleteMessage(item)
+                }
             }
         }
 

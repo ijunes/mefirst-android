@@ -35,4 +35,8 @@ class WorkTodayRepositoryImpl(private val database: MeFirstDatabase) : WorkToday
             database.workTodayDao().deleteAll()
         }
     }
+
+    override suspend fun deleteTodayNote(timestamp: Long) {
+        database.workTodayDao().delete(WorkTodayEntity(timestamp))
+    }
 }

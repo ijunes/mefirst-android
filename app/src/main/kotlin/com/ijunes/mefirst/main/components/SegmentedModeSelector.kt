@@ -40,8 +40,7 @@ fun SegmentedModeSelector(
     onModeChanged: (Boolean) -> Unit
 ) {
     val containerColor = Color(0xFFF1F4FF)
-    val selectedContentColor = Color(0xFF5A4035)
-    val unselectedContentColor = Color(0xFF9EA7D0)
+
 
     Row(
         modifier = modifier
@@ -57,8 +56,8 @@ fun SegmentedModeSelector(
             iconRes = R.drawable.ic_personal,
             isSelected = !isWorkMode,
             selectedColor = MaterialTheme.colorScheme.primaryContainer,
-            selectedContentColor = selectedContentColor,
-            unselectedContentColor = unselectedContentColor,
+            selectedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            unselectedContentColor = MaterialTheme.colorScheme.onPrimaryFixed,
             onClick = { onModeChanged(false) },
             modifier = Modifier.weight(1f)
         )
@@ -68,8 +67,8 @@ fun SegmentedModeSelector(
             iconRes = R.drawable.ic_work,
             isSelected = isWorkMode,
             selectedColor = MaterialTheme.colorScheme.primaryContainer,
-            selectedContentColor = selectedContentColor,
-            unselectedContentColor = unselectedContentColor,
+            selectedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            unselectedContentColor = MaterialTheme.colorScheme.onPrimaryFixed,
             onClick = { onModeChanged(true) },
             modifier = Modifier.weight(1f)
         )

@@ -1,6 +1,5 @@
 package com.ijunes.mefirst.main
 
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -111,7 +110,7 @@ fun MainScreen(
         }) { contentPadding ->
         NavHost(
             navController = navController,
-            startDestination = "today",
+            startDestination = MainScreenNavRoutes.Today.route.name,
             modifier = Modifier.padding(contentPadding)
         ) {
             composable(MainScreenNavRoutes.Today.route.name) {
@@ -125,6 +124,7 @@ fun MainScreen(
                     onGalleryClickListener = { onEvent(MainAction.OpenGallery) },
                     onCameraClickListener = { onEvent(MainAction.OpenCamera) },
                     onClearPendingImageListener = { onEvent(MainAction.ClearPendingImage) },
+                    onDeleteMessage = { onEvent(MainAction.DeleteMessage(it)) },
                     contentPadding = contentPadding,
                 )
             }

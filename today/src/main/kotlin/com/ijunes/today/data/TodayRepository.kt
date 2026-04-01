@@ -25,4 +25,10 @@ interface TodayRepository {
      */
     suspend fun flushTodayEntries()
 
+    /**
+     * Deletes a specific note by timestamp id that belongs to the current day.
+     */
+    suspend fun deleteTodayNote(timestamp: Long)
+
+
 }

@@ -26,4 +26,11 @@ interface WorkTodayRepository {
      * Called by the midnight alarm scheduler to reset the feed at the configured flush time.
      */
     suspend fun flushTodayEntries()
+
+    /**
+     * Deletes a specific note by timestamp id that belongs to the current day.
+     */
+    suspend fun deleteTodayNote(timestamp: Long)
+
+
 }

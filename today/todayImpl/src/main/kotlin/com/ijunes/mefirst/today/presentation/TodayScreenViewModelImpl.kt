@@ -106,6 +106,8 @@ class TodayScreenViewModelImpl(application: Application) : TodayViewModel(applic
                     }
                 }
             }
+            is MainAction.SetWorkMode -> modeHolder.setWorkMode(event.isWork)
+            is MainAction.DeleteMessage -> deleteTodayNote(event.message)
             MainAction.ClearPendingImage -> _pendingImageUri.value = null
             MainAction.DeleteToday -> clearToday()
             MainAction.OpenGallery -> _activityCommands.tryEmit(TodayAction.LaunchGallery)
@@ -114,7 +116,6 @@ class TodayScreenViewModelImpl(application: Application) : TodayViewModel(applic
                 val uri = FileProvider.getUriForFile(app, "${app.packageName}.fileprovider", file)
                 _activityCommands.tryEmit(TodayAction.LaunchCamera(uri))
             }
-            is MainAction.SetWorkMode -> modeHolder.setWorkMode(event.isWork)
         }
     }
 
@@ -288,6 +289,18 @@ class TodayScreenViewModelImpl(application: Application) : TodayViewModel(applic
                     workRepo.flushTodayEntries()
                 } else {
                     personalRepo.flushTodayEntries()
+                }
+            }
+        }
+    }
+
+    fun deleteTodayNote(message: Message) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                if (modeHolder.isWorkMode.value) {
+                    workRepo.deleteTodayNote(message.timeStamp)
+                } else {
+                    personalRepo.deleteTodayNote(message.timeStamp)
                 }
             }
         }

@@ -35,4 +35,8 @@ class TodayRepositoryImpl(private val database: MeFirstDatabase): TodayRepositor
         }
     }
 
+    override suspend fun deleteTodayNote(timestamp: Long) {
+        database.todayDao().delete(NoteEntity(timestamp))
+    }
+
 }
