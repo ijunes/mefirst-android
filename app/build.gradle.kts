@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
 }
 
 android {
@@ -46,25 +47,29 @@ android {
 }
 
 dependencies {
-    implementation(libs.androidx.activity.compose)
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.compose.ui)
-    implementation(libs.androidx.compose.ui.graphics)
-    implementation(libs.androidx.compose.ui.tooling.preview)
-    implementation(libs.androidx.compose.material3)
-    implementation(libs.androidx.navigation.compose)
-    implementation(libs.androidx.compose.material.icons.extended)
-    implementation(libs.koin)
+    // Project modules
     implementation(project(":database"))
-    implementation(project(":today"))
-    implementation(project(":today:todayApp"))
     implementation(project(":common"))
     implementation(project(":entries"))
     implementation(project(":entries:entriesApp"))
+    implementation(project(":today"))
+    implementation(project(":today:todayApp"))
     implementation(project(":ui"))
     implementation(project(":settings"))
     implementation(project(":settings:settingsApp"))
+
     implementation(platform(libs.firebase.bom))
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.compose.ui)
+    implementation(libs.androidx.compose.ui.graphics)
+    implementation(libs.androidx.compose.ui.tooling.preview)
+    implementation(libs.androidx.compose.material.icons.extended)
+    implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.koin)
+    implementation(libs.firebase.crashlytics)
+
 
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

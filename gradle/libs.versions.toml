@@ -6,6 +6,7 @@ composeBom = "2026.03.01"
 constraintlayout-compose = "1.1.1"
 coreKtx = "1.18.0"
 coroutinesTest = "1.10.2"
+crashlyticsPlugin = "3.0.6"
 espressoCore = "3.7.0"
 firebaseAppdistributionApiKtx = "16.0.0-beta15"
 firebaseBom = "34.11.0"
@@ -44,6 +45,7 @@ coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coi
 constraintlayout-compose = { module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "constraintlayout-compose" }
 firebase-appdistribution-api-ktx = { module = "com.google.firebase:firebase-appdistribution-api-ktx", version.ref = "firebaseAppdistributionApiKtx" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
+firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 koin = { group = "io.insert-koin", name = "koin-android", version.ref = "koin" }
 koin-test = { group = "io.insert-koin", name = "koin-test", version.ref = "koin" }
@@ -62,4 +64,4 @@ room = { id = "androidx.room", version.ref = "room"}
 android-library = { id = "com.android.library", version.ref = "agp" }
 jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }
 google-gms-services = { id = "com.google.gms.google-services", version.ref = "google-services" }
-
+firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "crashlyticsPlugin"}

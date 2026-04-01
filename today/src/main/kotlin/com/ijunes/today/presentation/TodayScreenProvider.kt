@@ -32,6 +32,7 @@ interface TodayScreenProvider {
         onChatSendClickListener: (String) -> Unit,
         onGalleryClickListener: () -> Unit,
         onCameraClickListener: () -> Unit,
+        onClearPendingImageListener: () -> Unit,
         contentPadding: PaddingValues,
     )
 }

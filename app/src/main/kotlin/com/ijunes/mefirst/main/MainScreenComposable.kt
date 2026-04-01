@@ -15,7 +15,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
@@ -34,6 +33,28 @@ import com.ijunes.mefirst.main.nav.toNavItem
 import com.ijunes.today.presentation.TodayScreenProvider
 import com.ijunes.today.presentation.TodayScreenUiModel
 
+/**
+ * Root composable for the main app shell.
+ *
+ * Renders a [Scaffold] with a top app bar, a bottom navigation bar, and a [NavHost] that
+ * switches between the Today, Entries, and Settings destinations. Screen content is delegated
+ * to provider interfaces ([TodayScreenProvider], [EntriesScreenProvider],
+ * [SettingsScreenProvider]) so that `:app` has no direct dependency on any feature
+ * implementation module.
+ *
+ * Navigation uses `launchSingleTop = true` and `restoreState = true` so that tapping a
+ * bottom-bar item that is already selected does not create a duplicate back-stack entry and
+ * preserves scroll/input state when switching between tabs.
+ *
+ * @param navController The [NavHostController] that drives tab navigation.
+ * @param uiState Aggregated UI state produced by [MainActivity] from the active ViewModels.
+ * @param onEvent Dispatcher for [MainAction] events raised by child screens.
+ * @param todayScreenProvider Composable provider for the Today destination.
+ * @param entriesScreenProvider Composable provider for the Entries destination.
+ * @param settingsScreenProvider Composable provider for the Settings destination.
+ * @param settingsViewModel Passed directly to the Settings screen because its provider
+ * interface requires a typed reference rather than a generic event callback.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
@@ -95,11 +116,15 @@ fun MainScreen(
         ) {
             composable(MainScreenNavRoutes.Today.route.name) {
                 todayScreenProvider.Content(
-                    uiModel = TodayScreenUiModel(messages = uiState.conversation),
+                    uiModel = TodayScreenUiModel(
+                        messages = uiState.conversation,
+                        pendingImageUri = uiState.pendingImageUri,
+                    ),
                     isRecording = uiState.isRecording,
                     onChatSendClickListener = { onEvent(MainAction.SendChat(it)) },
                     onGalleryClickListener = { onEvent(MainAction.OpenGallery) },
                     onCameraClickListener = { onEvent(MainAction.OpenCamera) },
+                    onClearPendingImageListener = { onEvent(MainAction.ClearPendingImage) },
                     contentPadding = contentPadding,
                 )
             }

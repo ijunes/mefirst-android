@@ -25,7 +25,7 @@ class SettingsViewModelImpl(application: Application) : SettingsViewModel(applic
     private val backupManager: BackupManager by inject(BackupManager::class.java)
 
     private val _activityCommands = MutableSharedFlow<SettingsAction>(extraBufferCapacity = 1)
-    override val activityCommands: SharedFlow<SettingsAction> = _activityCommands.asSharedFlow()
+    override val actions: SharedFlow<SettingsAction> = _activityCommands.asSharedFlow()
 
     private val _uiState = MutableStateFlow(
         SettingsUiState(hasPin = false)

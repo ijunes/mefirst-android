@@ -122,7 +122,7 @@ class TodayScreenViewModelImplTest {
         } returns PackageManager.PERMISSION_DENIED
 
         var received: TodayAction? = null
-        val job = backgroundScope.launch { viewModel.activityCommands.collect { received = it } }
+        val job = backgroundScope.launch { viewModel.actions.collect { received = it } }
 
         viewModel.handleEvent(MainAction.SendChat(""))
         testDispatcher.scheduler.advanceUntilIdle()
@@ -158,7 +158,7 @@ class TodayScreenViewModelImplTest {
     @Test
     fun `OpenGallery emits LaunchGallery command`() = runTest {
         var received: TodayAction? = null
-        val job = backgroundScope.launch { viewModel.activityCommands.collect { received = it } }
+        val job = backgroundScope.launch { viewModel.actions.collect { received = it } }
 
         viewModel.handleEvent(MainAction.OpenGallery)
         testDispatcher.scheduler.advanceUntilIdle()
@@ -176,7 +176,7 @@ class TodayScreenViewModelImplTest {
         every { FileProvider.getUriForFile(any(), any(), any()) } returns fakeUri
 
         var received: TodayAction? = null
-        val job = backgroundScope.launch { viewModel.activityCommands.collect { received = it } }
+        val job = backgroundScope.launch { viewModel.actions.collect { received = it } }
 
         viewModel.handleEvent(MainAction.OpenCamera)
         testDispatcher.scheduler.advanceUntilIdle()

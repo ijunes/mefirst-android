@@ -25,7 +25,7 @@ abstract class SettingsViewModel(application: Application) : AndroidViewModel(ap
      * picker launchers. Collect this in the Activity and dispatch each [SettingsAction] to the
      * appropriate launcher.
      */
-    abstract val activityCommands: SharedFlow<SettingsAction>
+    abstract val actions: SharedFlow<SettingsAction>
 
     /** Updates the daily flush time and reschedules the alarm. */
     abstract fun setFlushTime(hour: Int, minute: Int)

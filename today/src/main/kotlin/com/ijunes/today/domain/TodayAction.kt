@@ -8,7 +8,7 @@ import android.net.Uri
  *
  * These actions require Activity-level APIs (permission launchers, intent launchers) that cannot
  * be invoked directly from a Composable or ViewModel. The Activity collects
- * [com.ijunes.today.presentation.TodayViewModel.activityCommands] and dispatches each action to
+ * [com.ijunes.today.presentation.TodayViewModel.actions] and dispatches each action to
  * the appropriate launcher.
  */
 sealed interface TodayAction {

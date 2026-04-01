@@ -86,13 +86,17 @@ class TodayScreenViewModelImpl(application: Application) : TodayViewModel(applic
     override val isRecording: StateFlow<Boolean> = _isRecording
 
     private val _activityCommands = MutableSharedFlow<TodayAction>(extraBufferCapacity = 1)
-    override val activityCommands: SharedFlow<TodayAction> = _activityCommands.asSharedFlow()
+    override val actions: SharedFlow<TodayAction> = _activityCommands.asSharedFlow()
+
+    private val _pendingImageUri = MutableStateFlow<Uri?>(null)
+    override val pendingImageUri: StateFlow<Uri?> = _pendingImageUri
 
     override fun handleEvent(event: MainAction) {
         val app = getApplication<Application>()
         when (event) {
             is MainAction.SendChat -> when {
                 event.text.isNotEmpty() -> insertNote(event.text)
+                _pendingImageUri.value != null -> commitPendingImage()
                 isRecording.value -> stopRecording()
                 else -> {
                     if (app.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
@@ -102,6 +106,7 @@ class TodayScreenViewModelImpl(application: Application) : TodayViewModel(applic
                     }
                 }
             }
+            MainAction.ClearPendingImage -> _pendingImageUri.value = null
             MainAction.DeleteToday -> clearToday()
             MainAction.OpenGallery -> _activityCommands.tryEmit(TodayAction.LaunchGallery)
             MainAction.OpenCamera -> {
@@ -156,7 +161,13 @@ class TodayScreenViewModelImpl(application: Application) : TodayViewModel(applic
         }
     }
 
-    override fun insertImageNote(uri: Uri) {
+    override fun setPendingImage(uri: Uri) {
+        _pendingImageUri.value = uri
+    }
+
+    private fun commitPendingImage() {
+        val uri = _pendingImageUri.value ?: return
+        _pendingImageUri.value = null
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 if (modeHolder.isWorkMode.value) {

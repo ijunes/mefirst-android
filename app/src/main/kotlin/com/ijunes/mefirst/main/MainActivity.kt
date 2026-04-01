@@ -97,8 +97,9 @@ class MainActivity : ComponentActivity() {
                     entriesVM.entries,
                     todayVM.isRecording,
                     appModeVM.isWorkMode,
-                ) { conversation, entries, isRecording, isWorkMode ->
-                    MainScreenUiState(conversation, entries, isRecording, isWorkMode)
+                    todayVM.pendingImageUri,
+                ) { conversation, entries, isRecording, isWorkMode, pendingImageUri ->
+                    MainScreenUiState(conversation, entries, isRecording, isWorkMode, pendingImageUri)
                 }
             }.collectAsState(initial = MainScreenUiState())
 
@@ -111,14 +112,14 @@ class MainActivity : ComponentActivity() {
             val galleryLauncher = rememberLauncherForActivityResult(
                 ActivityResultContracts.GetContent()
             ) { uri ->
-                if (uri != null) todayVM.insertImageNote(uri)
+                if (uri != null) todayVM.setPendingImage(uri)
             }
 
             var cameraImageUri by remember { mutableStateOf<Uri?>(null) }
             val cameraLauncher = rememberLauncherForActivityResult(
                 ActivityResultContracts.TakePicture()
             ) { success ->
-                if (success) cameraImageUri?.let { todayVM.insertImageNote(it) }
+                if (success) cameraImageUri?.let { todayVM.setPendingImage(it) }
                 cameraImageUri = null
             }
 
@@ -135,7 +136,7 @@ class MainActivity : ComponentActivity() {
             }
 
             LaunchedEffect(Unit) {
-                todayVM.activityCommands.collect { command ->
+                todayVM.actions.collect { command ->
                     when (command) {
                         TodayAction.RequestRecordPermission ->
                             requestPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
@@ -150,7 +151,7 @@ class MainActivity : ComponentActivity() {
             }
 
             LaunchedEffect(Unit) {
-                settingsVM.activityCommands.collect { command ->
+                settingsVM.actions.collect { command ->
                     when (command) {
                         SettingsAction.LaunchBackupPicker ->
                             backupLauncher.launch("mefirst_backup.zip")
@@ -161,11 +162,11 @@ class MainActivity : ComponentActivity() {
             }
 
             LaunchedEffect(sharedImageUri) {
-                sharedImageUri?.let { todayVM.insertImageNote(it) }
+                sharedImageUri?.let { todayVM.setPendingImage(it) }
             }
 
             LaunchedEffect(sharedText) {
-                sharedText?.let { todayVM.insertNote(it) } // assuming this method exists
+                sharedText?.let { todayVM.insertNote(it) }
             }
 
             AppTheme(isWorkMode = uiState.isWorkMode) {

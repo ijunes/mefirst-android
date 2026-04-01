@@ -9,54 +9,92 @@ import com.ijunes.today.domain.TodayAction
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 
+
 /**
  * Abstract ViewModel for the Today feature.
  *
- * Defined in the `:today` API module so that `:app` can interact with the Today feature without
- * a direct dependency on `:today:todayImpl`. The concrete implementation
+ * Defined in the `:today` API module so that `:app` can depend on the Today feature without a
+ * direct compile-time dependency on `:today:todayImpl`. The concrete implementation
  * ([com.ijunes.mefirst.today.presentation.TodayScreenViewModelImpl]) lives in `:today:todayImpl`
  * and is bound to this class via Koin in `:today:todayApp`.
+ *
+ * ## Interaction model
+ * All UI-driven events flow in through [handleEvent]. Actions that require Activity-level APIs
+ * (permission requests, intent launchers) are emitted as one-shot [TodayAction] commands on
+ * [actions] and handled by the host Activity. The Activity feeds results back through
+ * [setPendingImage] and [startRecording] rather than through [handleEvent], keeping the
+ * ViewModel free of Activity references.
+ *
+ * ## Pending-image flow
+ * Selecting an image (gallery, camera, or share intent) calls [setPendingImage], which stores
+ * the URI in [pendingImageUri] without writing to the database. The image is only persisted when
+ * [handleEvent] receives [MainAction.SendChat] while [pendingImageUri] is non-null. The user can
+ * discard the staged image at any time via [MainAction.ClearPendingImage].
  */
 abstract class TodayViewModel(application: Application) : AndroidViewModel(application) {
 
     /**
-     * The ordered list of notes for the active mode (personal or work), emitted whenever the
-     * underlying data changes. Switches its source automatically when the user toggles work mode.
+     * Ordered list of notes for the active mode (personal or work), backed by the database and
+     * emitted whenever the underlying data changes. Switches its upstream source automatically
+     * when the user toggles work mode.
      */
     abstract val conversation: StateFlow<List<Message>>
 
-    /** Whether a voice recording is currently in progress. */
+    /** `true` while a voice recording is in progress. */
     abstract val isRecording: StateFlow<Boolean>
 
     /**
      * One-shot commands for the host Activity that require Activity-level APIs such as permission
-     * launchers or intent launchers. Collect this in the Activity and dispatch each [TodayAction]
-     * to the appropriate launcher.
+     * launchers or intent launchers. The Activity collects this flow and dispatches each
+     * [TodayAction] to the appropriate launcher.
      */
-    abstract val activityCommands: SharedFlow<TodayAction>
+    abstract val actions: SharedFlow<TodayAction>
 
     /**
-     * Entry point for all user interactions originating from the Today screen or its toolbar.
+     * Image URI staged for sending but not yet persisted. Non-null after the user selects an
+     * image via the gallery, camera, or a share intent. Cleared when [handleEvent] receives
+     * [MainAction.SendChat] (image is committed to the database) or [MainAction.ClearPendingImage]
+     * (image is discarded).
+     */
+    abstract val pendingImageUri: StateFlow<Uri?>
+
+    /**
+     * Entry point for all user interactions from the Today screen or its toolbar.
      *
-     * @param event A [MainAction] describing the user's intent (send a message, open the gallery,
-     * open the camera, toggle work mode, or delete today's notes).
+     * Key dispatch rules:
+     * - [MainAction.SendChat] with non-empty text → persists a text note.
+     * - [MainAction.SendChat] with empty text and a pending image → commits [pendingImageUri].
+     * - [MainAction.SendChat] with empty text and no pending image → toggles voice recording
+     *   (requests [android.Manifest.permission.RECORD_AUDIO] if not yet granted).
+     * - [MainAction.ClearPendingImage] → discards [pendingImageUri].
+     * - [MainAction.DeleteToday] → clears all of today's notes.
+     * - [MainAction.OpenGallery] / [MainAction.OpenCamera] → emits the corresponding
+     *   [TodayAction] on [actions] for the Activity to handle.
+     * - [MainAction.SetWorkMode] → switches the active data source and theme.
      */
     abstract fun handleEvent(event: MainAction)
 
     /**
-     * Begins capturing audio from the microphone.
-     * Called by the Activity after the [android.Manifest.permission.RECORD_AUDIO] permission has
-     * been granted in response to a [TodayAction.RequestRecordPermission] command.
+     * Begins capturing audio from the microphone. Called by the Activity after
+     * [android.Manifest.permission.RECORD_AUDIO] has been granted in response to a
+     * [TodayAction.RequestRecordPermission] command.
      */
     abstract fun startRecording()
 
     /**
-     * Persists an image note from the given [uri].
-     * Called by the Activity after the camera or gallery launcher returns a result.
+     * Stages [uri] as the pending image without persisting it. Called by the Activity after
+     * the gallery or camera launcher returns a result, or when the app receives a share intent
+     * with an image. The URI is stored in [pendingImageUri] and committed to the database only
+     * when the user triggers [MainAction.SendChat].
      *
-     * @param uri The content or file [Uri] of the image to attach.
+     * @param uri Content or file [Uri] of the image to attach.
      */
-    abstract fun insertImageNote(uri: Uri)
+    abstract fun setPendingImage(uri: Uri)
 
+    /**
+     * Persists a plain-text note immediately.
+     *
+     * @param msg The text content to save.
+     */
     abstract fun insertNote(msg: String)
 }

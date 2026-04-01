@@ -13,6 +13,7 @@ class TodayScreenProviderImpl : TodayScreenProvider {
         onChatSendClickListener: (String) -> Unit,
         onGalleryClickListener: () -> Unit,
         onCameraClickListener: () -> Unit,
+        onClearPendingImageListener: () -> Unit,
         contentPadding: PaddingValues,
     ) {
         TodayScreen(
@@ -21,6 +22,7 @@ class TodayScreenProviderImpl : TodayScreenProvider {
             onChatSendClickListener = onChatSendClickListener,
             onGalleryClickListener = onGalleryClickListener,
             onCameraClickListener = onCameraClickListener,
+            onClearPendingImageListener = onClearPendingImageListener,
             contentPadding = contentPadding,
         )
     }
