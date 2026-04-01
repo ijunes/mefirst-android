@@ -18,6 +18,7 @@ android {
 
 dependencies {
     implementation(project(":database"))
+    implementation(project(":common"))
     implementation(project(":today"))
     implementation(project(":today:todayImpl"))
     implementation(libs.koin)

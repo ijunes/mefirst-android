@@ -18,6 +18,7 @@ android {
 
 dependencies {
     implementation(project(":database"))
+    implementation(project(":common"))
     implementation(project(":settings"))
     implementation(project(":settings:settingsImpl"))
     implementation(libs.koin)
