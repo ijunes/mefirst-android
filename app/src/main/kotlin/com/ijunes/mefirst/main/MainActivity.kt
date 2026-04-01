@@ -9,7 +9,6 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.viewModels
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -38,7 +37,7 @@ class MainActivity : ComponentActivity() {
 
     private val todayVM: TodayViewModel by viewModel()
     private val entriesVM: EntriesViewModel by viewModel()
-    private val appModeVM: AppModeViewModel by viewModels()
+    private val appModeVM: AppModeViewModel by viewModel()
     private val settingsVM: SettingsViewModel by viewModel()
     private val todayScreenProvider: TodayScreenProvider by inject()
     private val entriesScreenProvider: EntriesScreenProvider by inject()

@@ -3,6 +3,7 @@ package com.ijunes.mefirst
 import android.app.Application
 import com.ijunes.mefirst.settings.alarm.AlarmScheduler
 import com.ijunes.mefirst.common.state.SettingsStateHolder
+import com.ijunes.mefirst.di.appModule
 import com.ijunes.mefirst.di.databaseModule
 import com.ijunes.mefirst.di.repositoryModule
 import com.ijunes.mefirst.entries.di.entriesModule
@@ -20,7 +21,7 @@ class MeFirstApplication: Application() {
         startKoin {
             androidContext(this@MeFirstApplication)
             androidLogger()
-            modules(databaseModule, repositoryModule, todayModule, entriesModule, settingsModule)
+            modules(databaseModule, repositoryModule, appModule, todayModule, entriesModule, settingsModule)
         }
         val settings: SettingsStateHolder = get()
         val alarmScheduler: AlarmScheduler = get()
