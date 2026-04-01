@@ -57,4 +57,6 @@ abstract class TodayViewModel(application: Application) : AndroidViewModel(appli
      * @param uri The content or file [Uri] of the image to attach.
      */
     abstract fun insertImageNote(uri: Uri)
+
+    abstract fun insertNote(msg: String)
 }

@@ -1,6 +1,7 @@
 package com.ijunes.mefirst.main
 
 import android.Manifest
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -47,6 +48,17 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val sharedImageUri: Uri? = if (intent?.action == Intent.ACTION_SEND) {
+            intent.getParcelableExtra(Intent.EXTRA_STREAM)
+        } else null
+
+        val sharedText: String? = if (intent?.action == Intent.ACTION_SEND &&
+            intent.type == "text/plain") {
+            intent.getStringExtra(Intent.EXTRA_TEXT)
+        } else null
+
+
         enableEdgeToEdge()
         setContent {
             var showOnboarding by remember { mutableStateOf(!onboardingStateHolder.isOnboardingComplete) }
@@ -146,6 +158,14 @@ class MainActivity : ComponentActivity() {
                             restoreLauncher.launch("application/zip")
                     }
                 }
+            }
+
+            LaunchedEffect(sharedImageUri) {
+                sharedImageUri?.let { todayVM.insertImageNote(it) }
+            }
+
+            LaunchedEffect(sharedText) {
+                sharedText?.let { todayVM.insertNote(it) } // assuming this method exists
             }
 
             AppTheme(isWorkMode = uiState.isWorkMode) {

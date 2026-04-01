@@ -118,7 +118,7 @@ class TodayScreenViewModelImpl(application: Application) : TodayViewModel(applic
     private val amplitudeSamples = mutableListOf<Int>()
     private var amplitudeSamplingJob: Job? = null
 
-    fun insertNote(msg: String) {
+    override fun insertNote(msg: String) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 if (modeHolder.isWorkMode.value) {
