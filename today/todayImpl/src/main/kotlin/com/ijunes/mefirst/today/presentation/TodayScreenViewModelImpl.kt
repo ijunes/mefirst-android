@@ -36,7 +36,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.koin.java.KoinJavaComponent.inject
 import java.io.File
 import java.io.FileOutputStream
 import androidx.core.graphics.createBitmap
@@ -46,10 +45,12 @@ import com.ijunes.today.data.WorkTodayRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.map
 
-class TodayScreenViewModelImpl(application: Application) : TodayViewModel(application) {
-    private val personalRepo: TodayRepository by inject(TodayRepository::class.java)
-    private val workRepo: WorkTodayRepository by inject(WorkTodayRepository::class.java)
-    private val modeHolder: ModeStateHolder by inject(ModeStateHolder::class.java)
+class TodayScreenViewModelImpl(
+    application: Application,
+    private val personalRepo: TodayRepository,
+    private val workRepo: WorkTodayRepository,
+    private val modeHolder: ModeStateHolder,
+) : TodayViewModel(application) {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override val conversation: StateFlow<List<Message>> = modeHolder.isWorkMode

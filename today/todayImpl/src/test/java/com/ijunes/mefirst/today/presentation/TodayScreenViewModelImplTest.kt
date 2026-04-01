@@ -30,9 +30,6 @@ import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
-import org.koin.core.context.startKoin
-import org.koin.core.context.stopKoin
-import org.koin.dsl.module
 import java.io.File
 
 /**
@@ -74,21 +71,12 @@ class TodayScreenViewModelImplTest {
         coEvery { mockPersonalRepo.getAllNotes() } returns emptyFlow()
         coEvery { mockWorkRepo.getAllNotes() } returns emptyFlow()
 
-        startKoin {
-            modules(module {
-                factory<TodayRepository> { mockPersonalRepo }
-                factory<WorkTodayRepository> { mockWorkRepo }
-                single { mockModeHolder }
-            })
-        }
-
-        viewModel = TodayScreenViewModelImpl(mockApp)
+        viewModel = TodayScreenViewModelImpl(mockApp, mockPersonalRepo, mockWorkRepo, mockModeHolder)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @After
     fun tearDown() {
-        stopKoin()
         Dispatchers.resetMain()
         unmockkAll()
     }
