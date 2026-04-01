@@ -11,12 +11,24 @@ import kotlinx.coroutines.flow.Flow
 interface TodayRepository {
 
     /**
+     * Deletes a specific note by timestamp id that belongs to the current day.
+     *
+     * @param timestamp - id of the note to delete
+     */
+    suspend fun deleteTodayNote(timestamp: Long)
+
+    /**
      * Returns a [Flow] that emits the full list of personal notes whenever the underlying data
      * changes. The flow remains active for the lifetime of the collector.
+     *
+     * @return [Flow] of [NoteEntity]s
      */
     suspend fun getAllNotes(): Flow<List<NoteEntity>>
 
-    /** Persists a new personal [note] to the data store. */
+    /** Persists a new personal [note] to the data store.
+     *
+     * @param note - note to persist
+     */
     suspend fun insertNote(note: NoteEntity)
 
     /**
@@ -25,10 +37,6 @@ interface TodayRepository {
      */
     suspend fun flushTodayEntries()
 
-    /**
-     * Deletes a specific note by timestamp id that belongs to the current day.
-     */
-    suspend fun deleteTodayNote(timestamp: Long)
 
 
 }

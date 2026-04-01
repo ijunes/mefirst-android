@@ -6,7 +6,6 @@ import com.ijunes.mefirst.database.entity.NoteEntity
 import com.ijunes.today.data.TodayRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 
 class TodayRepositoryImpl(private val database: MeFirstDatabase): TodayRepository {
 

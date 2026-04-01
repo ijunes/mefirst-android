@@ -15,8 +15,6 @@ interface TodayDao {
 
     @Insert
     fun insert(note: NoteEntity)
-    @Insert
-    fun insertAll(vararg notes: NoteEntity)
 
     @Delete
     fun delete(note: NoteEntity)

@@ -236,7 +236,11 @@ class TodayScreenViewModelImpl(
             recordingFile?.let { audioFile ->
                 viewModelScope.launch(Dispatchers.IO) {
                     val waveformFile = generateWaveformBitmap(audioFile.parentFile ?: audioFile, samples)
-                    insertVoiceNote(Uri.fromFile(audioFile), waveformFile?.let { Uri.fromFile(it) })
+                    val app = getApplication<Application>()
+                    val authority = "${app.packageName}.fileprovider"
+                    val audioUri = FileProvider.getUriForFile(app, authority, audioFile)
+                    val waveformUri = waveformFile?.let { FileProvider.getUriForFile(app, authority, it) }
+                    insertVoiceNote(audioUri, waveformUri)
                 }
             }
         } catch (_: Exception) {
