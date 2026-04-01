@@ -309,6 +309,11 @@ class TodayScreenViewModelImpl(application: Application) : TodayViewModel(applic
     override fun onCleared() {
         super.onCleared()
         amplitudeSamplingJob?.cancel()
+        if (_isRecording.value) {
+            try {
+                mediaRecorder?.stop()
+            } catch (_: Exception) {}
+        }
         mediaRecorder?.release()
         mediaRecorder = null
     }
