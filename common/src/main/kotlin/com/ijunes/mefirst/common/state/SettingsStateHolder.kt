@@ -6,12 +6,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.security.MessageDigest
+import java.security.SecureRandom
 
 private object Settings {
     const val PREFS_NAME = "app_prefs"
     const val FLUSH_HOUR = "flush_hour"
     const val FLUSH_MINUTE = "flush_minute"
     const val PIN_HASH = "pin_hash"
+    const val PIN_SALT = "pin_salt"
 }
 
 class SettingsStateHolder(context: Context) {
@@ -36,17 +38,33 @@ class SettingsStateHolder(context: Context) {
     val pinHash: String? get() = prefs.getString(Settings.PIN_HASH, null)
 
     fun setPin(pin: String) {
-        prefs.edit { putString(Settings.PIN_HASH, pin.sha256()) }
+        val salt = generateSalt()
+        prefs.edit {
+            putString(Settings.PIN_SALT, salt)
+            putString(Settings.PIN_HASH, hashPin(pin, salt))
+        }
     }
 
     fun removePin() {
-        prefs.edit { remove(Settings.PIN_HASH) }
+        prefs.edit {
+            remove(Settings.PIN_HASH)
+            remove(Settings.PIN_SALT)
+        }
     }
 
-    fun verifyPin(pin: String): Boolean = pinHash != null && pin.sha256() == pinHash
+    fun verifyPin(pin: String): Boolean {
+        val salt = prefs.getString(Settings.PIN_SALT, null) ?: return false
+        return pinHash != null && hashPin(pin, salt) == pinHash
+    }
 
-    private fun String.sha256(): String {
-        val bytes = MessageDigest.getInstance("SHA-256").digest(toByteArray())
+    private fun generateSalt(): String {
+        val bytes = ByteArray(16)
+        SecureRandom().nextBytes(bytes)
+        return bytes.joinToString("") { "%02x".format(it) }
+    }
+
+    private fun hashPin(pin: String, salt: String): String {
+        val bytes = MessageDigest.getInstance("SHA-256").digest((salt + pin).toByteArray())
         return bytes.joinToString("") { "%02x".format(it) }
     }
 }
