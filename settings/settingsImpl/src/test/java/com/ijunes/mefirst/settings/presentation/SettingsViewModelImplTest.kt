@@ -10,10 +10,13 @@ import io.mockk.mockk
 import io.mockk.runs
 import io.mockk.unmockkAll
 import io.mockk.verify
+import com.ijunes.mefirst.settings.domain.SettingsAction
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -87,16 +90,20 @@ class SettingsViewModelImplTest {
     // ── performRestore ────────────────────────────────────────────────────────
 
     @Test
-    fun `performRestore calls backup manager and sets Success result`() = runTest {
+    fun `performRestore emits RestartApp on success`() = runTest {
         val uri = mockk<Uri>()
         every { mockBackupManager.restore(uri) } just runs
+
+        var received: SettingsAction? = null
+        val job = backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.actions.collect { received = it }
+        }
 
         viewModel.performRestore(uri)
         testDispatcher.scheduler.advanceUntilIdle()
 
-        val state = viewModel.uiState.value
-        assertFalse(state.isRestoring)
-        assertEquals(BackupResult.Success, state.backupResult)
+        assertEquals(SettingsAction.RestartApp, received)
+        job.cancel()
     }
 
     @Test

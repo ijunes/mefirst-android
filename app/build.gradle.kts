@@ -66,8 +66,8 @@ dependencies {
     implementation(project(":common"))
     implementation(project(":entries:entriesApp"))
     implementation(project(":today:todayApp"))
-    implementation(project(":ui"))
     implementation(project(":settings:settingsApp"))
+    implementation(project(":ui"))
 
     implementation(platform(libs.firebase.bom))
     implementation(platform(libs.androidx.compose.bom))

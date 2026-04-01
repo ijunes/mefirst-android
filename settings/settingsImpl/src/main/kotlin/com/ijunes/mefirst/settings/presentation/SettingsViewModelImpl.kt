@@ -82,7 +82,7 @@ class SettingsViewModelImpl(
             _uiState.update { it.copy(isRestoring = true, backupResult = null) }
             try {
                 backupManager.restore(uri)
-                _uiState.update { it.copy(isRestoring = false, backupResult = BackupResult.Success) }
+                _activityCommands.emit(SettingsAction.RestartApp)
             } catch (e: Exception) {
                 _uiState.update {
                     it.copy(isRestoring = false, backupResult = BackupResult.Error(e.message ?: "Unknown error"))

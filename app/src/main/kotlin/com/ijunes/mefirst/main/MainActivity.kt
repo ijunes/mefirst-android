@@ -156,6 +156,12 @@ class MainActivity : ComponentActivity() {
                             backupLauncher.launch("mefirst_backup.zip")
                         SettingsAction.LaunchRestorePicker ->
                             restoreLauncher.launch("application/zip")
+                        SettingsAction.RestartApp -> {
+                            val intent = packageManager.getLaunchIntentForPackage(packageName)
+                                ?.apply { addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK) }
+                            startActivity(intent)
+                            finish()
+                        }
                     }
                 }
             }

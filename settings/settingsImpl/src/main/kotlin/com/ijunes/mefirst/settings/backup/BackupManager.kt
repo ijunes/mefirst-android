@@ -1,10 +1,8 @@
 package com.ijunes.mefirst.settings.backup
 
 import android.content.Context
-import android.content.Intent
 import android.net.Uri
 import android.os.Environment
-import android.os.Process
 import com.ijunes.mefirst.database.MeFirstDatabase
 import java.io.BufferedInputStream
 import java.io.BufferedOutputStream
@@ -71,11 +69,6 @@ class BackupManager(
                 }
             }
         }
-
-        val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)
-            ?.apply { addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK) }
-        context.startActivity(intent)
-        Process.killProcess(Process.myPid())
     }
 
     private fun addToZip(zip: ZipOutputStream, file: File, entryName: String) {
