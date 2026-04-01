@@ -1,8 +1,15 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
+}
+
+val localProperties = Properties().apply {
+    val f = rootProject.file("local.properties")
+    if (f.exists()) f.inputStream().use { load(it) }
 }
 
 android {
@@ -22,10 +29,10 @@ android {
     signingConfigs {
         create("release") {
             // Reference properties file for security
-            storeFile = file(project.findProperty("RELEASE_STORE_FILE") as? String ?: "path/to/keystore.jks")
-            storePassword = project.findProperty("RELEASE_STORE_PASSWORD") as? String ?: ""
-            keyAlias = project.findProperty("RELEASE_KEY_ALIAS") as? String ?: ""
-            keyPassword = project.findProperty("RELEASE_KEY_PASSWORD") as? String ?: ""
+            storeFile = file(localProperties.getProperty("RELEASE_STORE_FILE", "/path/to/keystore.jks"))
+            storePassword = localProperties.getProperty("RELEASE_STORE_PASSWORD", "")
+            keyAlias = localProperties.getProperty("RELEASE_KEY_ALIAS", "")
+            keyPassword = localProperties.getProperty("RELEASE_KEY_PASSWORD", "")
             enableV1Signing = true
             enableV2Signing = true
         }
@@ -57,12 +64,9 @@ dependencies {
     // Project modules
     implementation(project(":database"))
     implementation(project(":common"))
-    implementation(project(":entries"))
     implementation(project(":entries:entriesApp"))
-    implementation(project(":today"))
     implementation(project(":today:todayApp"))
     implementation(project(":ui"))
-    implementation(project(":settings"))
     implementation(project(":settings:settingsApp"))
 
     implementation(platform(libs.firebase.bom))

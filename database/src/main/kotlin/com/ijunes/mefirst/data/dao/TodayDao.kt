@@ -13,6 +13,9 @@ interface TodayDao {
     @Query("SELECT * FROM today")
     fun getAll(): Flow<List<NoteEntity>>
 
+    @Query("SELECT * FROM today")
+    suspend fun getAllOnce(): List<NoteEntity>
+
     @Insert
     fun insert(note: NoteEntity)
 

@@ -16,7 +16,7 @@ interface WorkTodayRepository {
      * Returns a [Flow] that emits the full list of work notes whenever the underlying data
      * changes. The flow remains active for the lifetime of the collector.
      */
-    suspend fun getAllNotes(): Flow<List<WorkTodayEntity>>
+    fun getAllNotes(): Flow<List<WorkTodayEntity>>
 
     /** Persists a new work [note] to the data store. */
     suspend fun insertNote(note: WorkTodayEntity)

@@ -23,7 +23,7 @@ interface TodayRepository {
      *
      * @return [Flow] of [NoteEntity]s
      */
-    suspend fun getAllNotes(): Flow<List<NoteEntity>>
+    fun getAllNotes(): Flow<List<NoteEntity>>
 
     /** Persists a new personal [note] to the data store.
      *

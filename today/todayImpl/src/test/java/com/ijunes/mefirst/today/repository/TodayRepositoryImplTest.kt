@@ -6,15 +6,14 @@ import com.ijunes.mefirst.database.MeFirstDatabase
 import com.ijunes.mefirst.database.entity.EntryEntity
 import com.ijunes.mefirst.database.entity.NoteEntity
 import com.ijunes.mefirst.database.model.MediaType
+import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
-import kotlin.collections.addAll
 
 class TodayRepositoryImplTest {
 
@@ -47,7 +46,7 @@ class TodayRepositoryImplTest {
             NoteEntity(1000L, "note 1", MediaType.TEXT),
             NoteEntity(2000L, "note 2", MediaType.TEXT),
         )
-        every { mockTodayDao.getAll() } returns flowOf(notes)
+        coEvery { mockTodayDao.getAllOnce() } returns notes
 
         val insertedEntries = mutableListOf<EntryEntity>()
         every { mockEntriesDao.addAllNoteEntries(*anyVararg()) } answers {
@@ -65,9 +64,7 @@ class TodayRepositoryImplTest {
 
     @Test
     fun `flushTodayEntries clears today table after inserting entries`() = runTest {
-        every { mockTodayDao.getAll() } returns flowOf(
-            listOf(NoteEntity(1L, "note", MediaType.TEXT))
-        )
+        coEvery { mockTodayDao.getAllOnce() } returns listOf(NoteEntity(1L, "note", MediaType.TEXT))
 
         repo.flushTodayEntries()
 
@@ -83,7 +80,7 @@ class TodayRepositoryImplTest {
             mediaPath = "file://audio.m4a",
             waveformPath = "file://waveform.png"
         )
-        every { mockTodayDao.getAll() } returns flowOf(listOf(note))
+        coEvery { mockTodayDao.getAllOnce() } returns listOf(note)
 
         val insertedEntries = mutableListOf<EntryEntity>()
         every { mockEntriesDao.addAllNoteEntries(*anyVararg()) } answers {

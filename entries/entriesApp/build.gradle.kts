@@ -17,9 +17,9 @@ android {
 }
 
 dependencies {
-    implementation(project(":database"))
+    api(project(":entries"))
     implementation(project(":common"))
-    implementation(project(":entries"))
+    implementation(project(":database"))
     implementation(project(":entries:entriesImpl"))
     implementation(libs.koin)
 }

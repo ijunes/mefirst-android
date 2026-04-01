@@ -5,12 +5,10 @@ import com.ijunes.mefirst.database.entity.WorkEntryEntity
 import com.ijunes.mefirst.database.entity.WorkTodayEntity
 import com.ijunes.today.data.WorkTodayRepository
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 
 class WorkTodayRepositoryImpl(private val database: MeFirstDatabase) : WorkTodayRepository {
 
-    override suspend fun getAllNotes(): Flow<List<WorkTodayEntity>> {
+    override fun getAllNotes(): Flow<List<WorkTodayEntity>> {
         return database.workTodayDao().getAll()
     }
 
@@ -19,7 +17,7 @@ class WorkTodayRepositoryImpl(private val database: MeFirstDatabase) : WorkToday
     }
 
     override suspend fun flushTodayEntries() {
-        val entryList = database.workTodayDao().getAll().first().map { note ->
+        val entryList = database.workTodayDao().getAllOnce().map { note ->
             WorkEntryEntity(
                 timeStamp = note.timeStamp,
                 text = note.noteText,

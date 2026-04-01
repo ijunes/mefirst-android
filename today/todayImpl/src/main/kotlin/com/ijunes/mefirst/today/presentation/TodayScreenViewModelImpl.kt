@@ -86,7 +86,7 @@ class TodayScreenViewModelImpl(
     private val _isRecording = MutableStateFlow(false)
     override val isRecording: StateFlow<Boolean> = _isRecording
 
-    private val _activityCommands = MutableSharedFlow<TodayAction>(extraBufferCapacity = 1)
+    private val _activityCommands = MutableSharedFlow<TodayAction>(extraBufferCapacity = 64)
     override val actions: SharedFlow<TodayAction> = _activityCommands.asSharedFlow()
 
     private val _pendingImageUri = MutableStateFlow<Uri?>(null)

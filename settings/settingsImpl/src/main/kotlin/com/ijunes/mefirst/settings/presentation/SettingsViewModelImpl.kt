@@ -24,7 +24,7 @@ class SettingsViewModelImpl(
     private val backupManager: BackupManager,
 ) : SettingsViewModel(application) {
 
-    private val _activityCommands = MutableSharedFlow<SettingsAction>(extraBufferCapacity = 1)
+    private val _activityCommands = MutableSharedFlow<SettingsAction>(extraBufferCapacity = 64)
     override val actions: SharedFlow<SettingsAction> = _activityCommands.asSharedFlow()
 
     private val _uiState = MutableStateFlow(
