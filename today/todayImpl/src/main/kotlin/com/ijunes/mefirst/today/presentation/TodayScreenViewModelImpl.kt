@@ -12,17 +12,22 @@ import android.media.MediaRecorder
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
+import android.util.Log
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import androidx.lifecycle.viewModelScope
-import com.ijunes.mefirst.database.model.MediaType
+import com.ijunes.mefirst.common.action.MainAction
+import com.ijunes.mefirst.common.data.Message
+import com.ijunes.mefirst.common.state.ModeStateHolder
 import com.ijunes.mefirst.database.entity.NoteEntity
 import com.ijunes.mefirst.database.entity.WorkTodayEntity
-import com.ijunes.mefirst.common.state.ModeStateHolder
-import com.ijunes.mefirst.common.data.Message
+import com.ijunes.mefirst.database.model.MediaType
+import com.ijunes.today.data.TodayRepository
+import com.ijunes.today.data.WorkTodayRepository
 import com.ijunes.today.domain.TodayAction
 import com.ijunes.today.presentation.TodayViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -32,6 +37,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -39,11 +45,6 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
 import androidx.core.graphics.createBitmap
-import com.ijunes.mefirst.common.action.MainAction
-import com.ijunes.today.data.TodayRepository
-import com.ijunes.today.data.WorkTodayRepository
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.map
 
 class TodayScreenViewModelImpl(
     application: Application,
@@ -92,6 +93,23 @@ class TodayScreenViewModelImpl(
     private val _pendingImageUri = MutableStateFlow<Uri?>(null)
     override val pendingImageUri: StateFlow<Uri?> = _pendingImageUri
 
+    // Dispatches a suspend block on Dispatchers.IO, logging any uncaught exceptions.
+    private fun launchIO(block: suspend () -> Unit) {
+        viewModelScope.launch {
+            try {
+                withContext(Dispatchers.IO) { block() }
+            } catch (e: Exception) {
+                Log.e("TodayViewModel", "IO operation failed", e)
+            }
+        }
+    }
+
+    // Runs personal or work repo operation based on the active mode.
+    private suspend fun <T> withActiveRepo(
+        personal: suspend (TodayRepository) -> T,
+        work: suspend (WorkTodayRepository) -> T,
+    ): T = if (modeHolder.isWorkMode.value) work(workRepo) else personal(personalRepo)
+
     override fun handleEvent(event: MainAction) {
         val app = getApplication<Application>()
         when (event) {
@@ -126,40 +144,11 @@ class TodayScreenViewModelImpl(
     private var amplitudeSamplingJob: Job? = null
 
     override fun insertNote(msg: String) {
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                if (modeHolder.isWorkMode.value) {
-                    workRepo.insertNote(WorkTodayEntity(System.currentTimeMillis(), msg))
-                } else {
-                    personalRepo.insertNote(NoteEntity(System.currentTimeMillis(), msg))
-                }
-            }
-        }
-    }
-
-    fun insertVoiceNote(uri: Uri, waveformUri: Uri? = null) {
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                if (modeHolder.isWorkMode.value) {
-                    workRepo.insertNote(
-                        WorkTodayEntity(
-                            System.currentTimeMillis(),
-                            mediaType = MediaType.VOICE,
-                            mediaPath = uri.toString(),
-                            waveformPath = waveformUri?.toString()
-                        )
-                    )
-                } else {
-                    personalRepo.insertNote(
-                        NoteEntity(
-                            System.currentTimeMillis(),
-                            mediaType = MediaType.VOICE,
-                            mediaPath = uri.toString(),
-                            waveformPath = waveformUri?.toString()
-                        )
-                    )
-                }
-            }
+        launchIO {
+            withActiveRepo(
+                personal = { it.insertNote(NoteEntity(System.currentTimeMillis(), msg)) },
+                work = { it.insertNote(WorkTodayEntity(System.currentTimeMillis(), msg)) },
+            )
         }
     }
 
@@ -170,26 +159,11 @@ class TodayScreenViewModelImpl(
     private fun commitPendingImage() {
         val uri = _pendingImageUri.value ?: return
         _pendingImageUri.value = null
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                if (modeHolder.isWorkMode.value) {
-                    workRepo.insertNote(
-                        WorkTodayEntity(
-                            System.currentTimeMillis(),
-                            mediaType = MediaType.IMAGE,
-                            mediaPath = uri.toString()
-                        )
-                    )
-                } else {
-                    personalRepo.insertNote(
-                        NoteEntity(
-                            System.currentTimeMillis(),
-                            mediaType = MediaType.IMAGE,
-                            mediaPath = uri.toString()
-                        )
-                    )
-                }
-            }
+        launchIO {
+            withActiveRepo(
+                personal = { it.insertNote(NoteEntity(System.currentTimeMillis(), mediaType = MediaType.IMAGE, mediaPath = uri.toString())) },
+                work = { it.insertNote(WorkTodayEntity(System.currentTimeMillis(), mediaType = MediaType.IMAGE, mediaPath = uri.toString())) },
+            )
         }
     }
 
@@ -234,13 +208,16 @@ class TodayScreenViewModelImpl(
             mediaRecorder?.release()
             mediaRecorder = null
             recordingFile?.let { audioFile ->
-                viewModelScope.launch(Dispatchers.IO) {
+                launchIO {
                     val waveformFile = generateWaveformBitmap(audioFile.parentFile ?: audioFile, samples)
                     val app = getApplication<Application>()
                     val authority = "${app.packageName}.fileprovider"
                     val audioUri = FileProvider.getUriForFile(app, authority, audioFile)
                     val waveformUri = waveformFile?.let { FileProvider.getUriForFile(app, authority, it) }
-                    insertVoiceNote(audioUri, waveformUri)
+                    withActiveRepo(
+                        personal = { it.insertNote(NoteEntity(System.currentTimeMillis(), mediaType = MediaType.VOICE, mediaPath = audioUri.toString(), waveformPath = waveformUri?.toString())) },
+                        work = { it.insertNote(WorkTodayEntity(System.currentTimeMillis(), mediaType = MediaType.VOICE, mediaPath = audioUri.toString(), waveformPath = waveformUri?.toString())) },
+                    )
                 }
             }
         } catch (_: Exception) {
@@ -288,26 +265,20 @@ class TodayScreenViewModelImpl(
     }
 
     fun clearToday() {
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                if (modeHolder.isWorkMode.value) {
-                    workRepo.flushTodayEntries()
-                } else {
-                    personalRepo.flushTodayEntries()
-                }
-            }
+        launchIO {
+            withActiveRepo(
+                personal = { it.flushTodayEntries() },
+                work = { it.flushTodayEntries() },
+            )
         }
     }
 
     fun deleteTodayNote(message: Message) {
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                if (modeHolder.isWorkMode.value) {
-                    workRepo.deleteTodayNote(message.timeStamp)
-                } else {
-                    personalRepo.deleteTodayNote(message.timeStamp)
-                }
-            }
+        launchIO {
+            withActiveRepo(
+                personal = { it.deleteTodayNote(message.timeStamp) },
+                work = { it.deleteTodayNote(message.timeStamp) },
+            )
         }
     }
 
