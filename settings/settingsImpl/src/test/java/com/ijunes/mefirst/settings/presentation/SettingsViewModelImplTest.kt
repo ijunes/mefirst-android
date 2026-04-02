@@ -4,9 +4,11 @@ import android.app.Application
 import android.net.Uri
 import com.ijunes.mefirst.common.state.SettingsStateHolder
 import com.ijunes.mefirst.settings.backup.BackupManager
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
+import io.mockk.mockkStatic
 import io.mockk.runs
 import io.mockk.unmockkAll
 import io.mockk.verify
@@ -41,6 +43,8 @@ class SettingsViewModelImplTest {
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
+        mockkStatic(FirebaseCrashlytics::class)
+        every { FirebaseCrashlytics.getInstance() } returns mockk(relaxed = true)
 
         mockApp = mockk(relaxed = true)
         mockStateHolder = mockk(relaxed = true) {
@@ -50,7 +54,7 @@ class SettingsViewModelImplTest {
         }
         mockBackupManager = mockk(relaxed = true)
 
-        viewModel = SettingsViewModelImpl(mockApp, mockStateHolder, mockBackupManager)
+        viewModel = SettingsViewModelImpl(mockApp, mockStateHolder, mockBackupManager, testDispatcher)
     }
 
     @After

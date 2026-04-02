@@ -1,5 +1,6 @@
 package com.ijunes.mefirst.today.di
 
+import com.ijunes.mefirst.today.recording.AudioRecordingManager
 import com.ijunes.today.data.TodayRepository
 import com.ijunes.today.presentation.TodayScreenProvider
 import com.ijunes.today.presentation.TodayViewModel
@@ -13,6 +14,9 @@ import org.koin.dsl.module
 
 val todayModule = module {
     factory<TodayRepository> { TodayRepositoryImpl(get()) }
-    viewModel<TodayViewModel> { TodayScreenViewModelImpl(androidApplication(), get(), get<ModeStateHolder>()) }
+    factory { AudioRecordingManager(androidApplication()) }
+    viewModel<TodayViewModel> {
+        TodayScreenViewModelImpl(androidApplication(), get(), get<ModeStateHolder>(), get())
+    }
     single<TodayScreenProvider> { TodayScreenProviderImpl() }
 }

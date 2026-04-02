@@ -37,9 +37,47 @@ val MIGRATION_2_3 = object : Migration(2, 3) {
     }
 }
 
+val MIGRATION_3_4 = object : Migration(3, 4) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        // Recreate today with UUID PK
+        db.execSQL("""
+            CREATE TABLE `today_new` (
+                `id` TEXT NOT NULL,
+                `timeStamp` INTEGER NOT NULL,
+                `note_text` TEXT,
+                `media_type` INTEGER NOT NULL DEFAULT 0,
+                `media_path` TEXT,
+                `waveform_path` TEXT,
+                `mode` TEXT NOT NULL DEFAULT 'PERSONAL',
+                PRIMARY KEY(`id`)
+            )
+        """.trimIndent())
+        db.execSQL("INSERT INTO `today_new` SELECT lower(hex(randomblob(16))), timeStamp, note_text, media_type, media_path, waveform_path, mode FROM `today`")
+        db.execSQL("DROP TABLE `today`")
+        db.execSQL("ALTER TABLE `today_new` RENAME TO `today`")
+
+        // Recreate entries with UUID PK
+        db.execSQL("""
+            CREATE TABLE `entries_new` (
+                `id` TEXT NOT NULL,
+                `timeStamp` INTEGER NOT NULL,
+                `entry_text` TEXT,
+                `media_type` INTEGER NOT NULL DEFAULT 0,
+                `media_path` TEXT,
+                `waveform_path` TEXT,
+                `mode` TEXT NOT NULL DEFAULT 'PERSONAL',
+                PRIMARY KEY(`id`)
+            )
+        """.trimIndent())
+        db.execSQL("INSERT INTO `entries_new` SELECT lower(hex(randomblob(16))), timeStamp, entry_text, media_type, media_path, waveform_path, mode FROM `entries`")
+        db.execSQL("DROP TABLE `entries`")
+        db.execSQL("ALTER TABLE `entries_new` RENAME TO `entries`")
+    }
+}
+
 @Database(
     entities = [NoteEntity::class, EntryEntity::class],
-    version = 3
+    version = 4
 )
 @TypeConverters(Converters::class)
 abstract class MeFirstDatabase : RoomDatabase() {

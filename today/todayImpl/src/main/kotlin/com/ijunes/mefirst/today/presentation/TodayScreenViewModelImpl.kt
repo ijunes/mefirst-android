@@ -3,18 +3,9 @@ package com.ijunes.mefirst.today.presentation
 import android.Manifest
 import android.app.Application
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.RectF
-import android.media.MediaRecorder
 import android.net.Uri
-import android.os.Build
-import android.os.Environment
 import android.util.Log
 import androidx.core.content.FileProvider
-import androidx.core.net.toUri
 import androidx.lifecycle.viewModelScope
 import com.ijunes.mefirst.common.action.MainAction
 import com.ijunes.mefirst.common.data.Message
@@ -22,9 +13,11 @@ import com.ijunes.mefirst.common.state.ModeStateHolder
 import com.ijunes.mefirst.database.entity.NoteEntity
 import com.ijunes.mefirst.database.model.MediaType
 import com.ijunes.mefirst.database.model.NoteMode
+import com.ijunes.mefirst.today.recording.AudioRecordingManager
 import com.ijunes.today.data.TodayRepository
 import com.ijunes.today.domain.TodayAction
 import com.ijunes.today.presentation.TodayViewModel
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
@@ -35,6 +28,7 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -42,13 +36,17 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
-import java.io.FileOutputStream
-import androidx.core.graphics.createBitmap
+
+// How long a StateFlow stays active after the last subscriber unsubscribes, giving
+// the UI time to resubscribe during configuration changes without restarting the query.
+private const val FLOW_TIMEOUT_MS = 5_000L
 
 class TodayScreenViewModelImpl(
     application: Application,
     private val repo: TodayRepository,
     private val modeHolder: ModeStateHolder,
+    private val audioRecordingManager: AudioRecordingManager,
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : TodayViewModel(application) {
 
     private val activeMode: NoteMode
@@ -61,19 +59,20 @@ class TodayScreenViewModelImpl(
             repo.getAllNotes(mode).map { notes ->
                 notes.map {
                     Message(
+                        id = it.id,
                         text = it.noteText ?: "",
                         mediaType = it.mediaType,
                         timeStamp = it.timeStamp,
-                        mediaPath = it.mediaPath?.toUri(),
-                        waveformPath = it.waveformPath?.toUri()
+                        mediaPath = it.mediaPath?.let { p -> Uri.parse(p) },
+                        waveformPath = it.waveformPath?.let { p -> Uri.parse(p) }
                     )
                 }
             }
         }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+        .catch { e -> Log.e("TodayViewModel", "Failed to load notes", e) }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(FLOW_TIMEOUT_MS), emptyList())
 
-    private val _isRecording = MutableStateFlow(false)
-    override val isRecording: StateFlow<Boolean> = _isRecording
+    override val isRecording: StateFlow<Boolean> = audioRecordingManager.isRecording
 
     private val _activityCommands = MutableSharedFlow<TodayAction>(extraBufferCapacity = 64)
     override val actions: SharedFlow<TodayAction> = _activityCommands.asSharedFlow()
@@ -84,7 +83,7 @@ class TodayScreenViewModelImpl(
     private fun launchIO(block: suspend () -> Unit) {
         viewModelScope.launch {
             try {
-                withContext(Dispatchers.IO) { block() }
+                withContext(ioDispatcher) { block() }
             } catch (e: Exception) {
                 Log.e("TodayViewModel", "IO operation failed", e)
             }
@@ -119,14 +118,11 @@ class TodayScreenViewModelImpl(
         }
     }
 
-    private var mediaRecorder: MediaRecorder? = null
-    private var recordingFile: File? = null
-    private val amplitudeSamples = mutableListOf<Int>()
     private var amplitudeSamplingJob: Job? = null
 
     override fun insertNote(msg: String) {
         launchIO {
-            repo.insertNote(NoteEntity(System.currentTimeMillis(), msg, mode = activeMode))
+            repo.insertNote(NoteEntity(timeStamp = System.currentTimeMillis(), noteText = msg, mode = activeMode))
         }
     }
 
@@ -138,35 +134,15 @@ class TodayScreenViewModelImpl(
         val uri = _pendingImageUri.value ?: return
         _pendingImageUri.value = null
         launchIO {
-            repo.insertNote(NoteEntity(System.currentTimeMillis(), mediaType = MediaType.IMAGE, mediaPath = uri.toString(), mode = activeMode))
+            repo.insertNote(NoteEntity(timeStamp = System.currentTimeMillis(), mediaType = MediaType.IMAGE, mediaPath = uri.toString(), mode = activeMode))
         }
     }
 
     override fun startRecording() {
-        val app = getApplication<Application>()
-        val dir = app.getExternalFilesDir(Environment.DIRECTORY_MUSIC) ?: app.filesDir
-        val file = File(dir, "voice_${System.currentTimeMillis()}.m4a")
-        recordingFile = file
-
-        val recorder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            MediaRecorder(app)
-        } else {
-            @Suppress("DEPRECATION")
-            MediaRecorder()
-        }
-        recorder.setAudioSource(MediaRecorder.AudioSource.MIC)
-        recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
-        recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
-        recorder.setOutputFile(file.absolutePath)
-        recorder.prepare()
-        recorder.start()
-        mediaRecorder = recorder
-        _isRecording.value = true
-
-        amplitudeSamples.clear()
+        audioRecordingManager.start()
         amplitudeSamplingJob = viewModelScope.launch {
             while (isActive) {
-                amplitudeSamples.add(mediaRecorder?.maxAmplitude ?: 0)
+                audioRecordingManager.sampleAmplitude()
                 delay(100)
             }
         }
@@ -175,65 +151,21 @@ class TodayScreenViewModelImpl(
     fun stopRecording() {
         amplitudeSamplingJob?.cancel()
         amplitudeSamplingJob = null
-        val samples = amplitudeSamples.toList()
-        amplitudeSamples.clear()
         val mode = activeMode
+        val result = audioRecordingManager.stop() ?: return
 
-        try {
-            mediaRecorder?.stop()
-            mediaRecorder?.release()
-            mediaRecorder = null
-            recordingFile?.let { audioFile ->
-                launchIO {
-                    val waveformFile = generateWaveformBitmap(audioFile.parentFile ?: audioFile, samples)
-                    val app = getApplication<Application>()
-                    val authority = "${app.packageName}.fileprovider"
-                    val audioUri = FileProvider.getUriForFile(app, authority, audioFile)
-                    val waveformUri = waveformFile?.let { FileProvider.getUriForFile(app, authority, it) }
-                    repo.insertNote(NoteEntity(System.currentTimeMillis(), mediaType = MediaType.VOICE, mediaPath = audioUri.toString(), waveformPath = waveformUri?.toString(), mode = mode))
-                }
-            }
-        } catch (_: Exception) {
-            // recording failed, discard
-        } finally {
-            recordingFile = null
-            _isRecording.value = false
-        }
-    }
-
-    private fun generateWaveformBitmap(dir: File, amplitudes: List<Int>): File? {
-        if (amplitudes.isEmpty()) return null
-        val width = 400
-        val height = 100
-        val bitmap = createBitmap(width, height)
-        val canvas = Canvas(bitmap)
-        val paint = Paint().apply {
-            color = Color.WHITE
-            style = Paint.Style.FILL
-            isAntiAlias = true
-        }
-        val maxAmp = amplitudes.max().coerceAtLeast(1)
-        val barCount = amplitudes.size
-        val stride = width.toFloat() / barCount
-        val barWidth = stride * 0.7f
-
-        amplitudes.forEachIndexed { i, amp ->
-            val barHeight = ((amp.toFloat() / maxAmp) * (height - 8)).coerceAtLeast(4f)
-            val x = i * stride
-            val y = (height - barHeight) / 2f
-            canvas.drawRoundRect(RectF(x, y, x + barWidth, y + barHeight), barWidth / 2, barWidth / 2, paint)
-        }
-
-        return try {
-            val file = File(dir, "waveform_${System.currentTimeMillis()}.png")
-            FileOutputStream(file).use { out ->
-                bitmap.compress(Bitmap.CompressFormat.PNG, 90, out)
-            }
-            file
-        } catch (_: Exception) {
-            null
-        } finally {
-            bitmap.recycle()
+        launchIO {
+            val app = getApplication<Application>()
+            val authority = "${app.packageName}.fileprovider"
+            val audioUri = FileProvider.getUriForFile(app, authority, result.audioFile)
+            val waveformUri = result.waveformFile?.let { FileProvider.getUriForFile(app, authority, it) }
+            repo.insertNote(NoteEntity(
+                timeStamp = System.currentTimeMillis(),
+                mediaType = MediaType.VOICE,
+                mediaPath = audioUri.toString(),
+                waveformPath = waveformUri?.toString(),
+                mode = mode,
+            ))
         }
     }
 
@@ -245,19 +177,13 @@ class TodayScreenViewModelImpl(
 
     fun deleteTodayNote(message: Message) {
         launchIO {
-            repo.deleteTodayNote(message.timeStamp, activeMode)
+            repo.deleteTodayNote(message.id)
         }
     }
 
     override fun onCleared() {
         super.onCleared()
         amplitudeSamplingJob?.cancel()
-        if (_isRecording.value) {
-            try {
-                mediaRecorder?.stop()
-            } catch (_: Exception) {}
-        }
-        mediaRecorder?.release()
-        mediaRecorder = null
+        audioRecordingManager.release()
     }
 }

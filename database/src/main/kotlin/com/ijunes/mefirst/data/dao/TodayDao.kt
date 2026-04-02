@@ -19,8 +19,8 @@ interface TodayDao {
     @Insert
     fun insert(note: NoteEntity)
 
-    @Query("DELETE FROM today WHERE timeStamp = :timestamp AND mode = :mode")
-    fun delete(timestamp: Long, mode: NoteMode)
+    @Query("DELETE FROM today WHERE id = :id")
+    fun delete(id: String)
 
     @Query("DELETE FROM today WHERE mode = :mode")
     fun deleteAll(mode: NoteMode)

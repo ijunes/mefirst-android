@@ -37,14 +37,14 @@ fun EntriesScreenPreview() {
             uiModel = EntriesScreenUiModel(
                 entries = mapOf(
                     100000L to listOf(
-                        Message(System.currentTimeMillis(), "Hello"),
-                        Message(System.currentTimeMillis() + 10000, "Hello"),
-                        Message(System.currentTimeMillis() + 20000, "Hello"),
+                        Message(id = "preview1", timeStamp = System.currentTimeMillis(), text = "Hello"),
+                        Message(id = "preview2", timeStamp = System.currentTimeMillis() + 10000, text = "Hello"),
+                        Message(id = "preview3", timeStamp = System.currentTimeMillis() + 20000, text = "Hello"),
                     ),
                     300000L to listOf(
-                        Message(System.currentTimeMillis(), "Hello"),
-                        Message(System.currentTimeMillis() + 10000, "Hello"),
-                        Message(System.currentTimeMillis() + 20000, "Hello"),
+                        Message(id = "preview4", timeStamp = System.currentTimeMillis(), text = "Hello"),
+                        Message(id = "preview5", timeStamp = System.currentTimeMillis() + 10000, text = "Hello"),
+                        Message(id = "preview6", timeStamp = System.currentTimeMillis() + 20000, text = "Hello"),
                     )
                 )
             )

@@ -3,6 +3,7 @@ package com.ijunes.mefirst.settings.backup
 import android.content.Context
 import android.net.Uri
 import android.os.Environment
+import android.util.Log
 import com.ijunes.mefirst.database.MeFirstDatabase
 import java.io.BufferedInputStream
 import java.io.BufferedOutputStream
@@ -10,6 +11,8 @@ import java.io.File
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
+
+private const val TAG = "BackupManager"
 
 class BackupManager(
     private val context: Context,
@@ -61,7 +64,10 @@ class BackupManager(
                         else -> null
                     }
                     if (dest != null) {
-                        dest.parentFile?.mkdirs()
+                        val parent = dest.parentFile
+                        if (parent != null && !parent.exists() && !parent.mkdirs()) {
+                            Log.w(TAG, "Failed to create directory: ${parent.absolutePath}")
+                        }
                         dest.outputStream().use { zip.copyTo(it) }
                     }
                     zip.closeEntry()

@@ -1,13 +1,19 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 3,
-    "identityHash": "d56ce734cc4794095d9eee66bd8f1a23",
+    "version": 1,
+    "identityHash": "b9ba7e5ebe93ff20a9b66292d44a1337",
     "entities": [
       {
         "tableName": "today",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`timeStamp` INTEGER NOT NULL, `note_text` TEXT, `media_type` INTEGER NOT NULL, `media_path` TEXT, `waveform_path` TEXT, `mode` TEXT NOT NULL, PRIMARY KEY(`timeStamp`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `timeStamp` INTEGER NOT NULL, `note_text` TEXT, `media_type` INTEGER NOT NULL, `media_path` TEXT, `waveform_path` TEXT, `mode` TEXT NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
           {
             "fieldPath": "timeStamp",
             "columnName": "timeStamp",
@@ -45,14 +51,31 @@
         "primaryKey": {
           "autoGenerate": false,
           "columnNames": [
-            "timeStamp"
+            "id"
           ]
-        }
+        },
+        "indices": [
+          {
+            "name": "index_today_mode",
+            "unique": false,
+            "columnNames": [
+              "mode"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_today_mode` ON `${TABLE_NAME}` (`mode`)"
+          }
+        ]
       },
       {
         "tableName": "entries",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`timeStamp` INTEGER NOT NULL, `entry_text` TEXT, `media_type` INTEGER NOT NULL, `media_path` TEXT, `waveform_path` TEXT, `mode` TEXT NOT NULL, PRIMARY KEY(`timeStamp`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `timeStamp` INTEGER NOT NULL, `entry_text` TEXT, `media_type` INTEGER NOT NULL, `media_path` TEXT, `waveform_path` TEXT, `mode` TEXT NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
           {
             "fieldPath": "timeStamp",
             "columnName": "timeStamp",
@@ -90,14 +113,26 @@
         "primaryKey": {
           "autoGenerate": false,
           "columnNames": [
-            "timeStamp"
+            "id"
           ]
-        }
+        },
+        "indices": [
+          {
+            "name": "index_entries_timeStamp_mode",
+            "unique": false,
+            "columnNames": [
+              "timeStamp",
+              "mode"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_entries_timeStamp_mode` ON `${TABLE_NAME}` (`timeStamp`, `mode`)"
+          }
+        ]
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd56ce734cc4794095d9eee66bd8f1a23')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b9ba7e5ebe93ff20a9b66292d44a1337')"
     ]
   }
 }

@@ -44,8 +44,8 @@ class TodayRepositoryImplTest {
     @Test
     fun `flushTodayEntries calls addAllNoteEntries with converted entries`() = runTest {
         val notes = listOf(
-            NoteEntity(1000L, "note 1", MediaType.TEXT),
-            NoteEntity(2000L, "note 2", MediaType.TEXT),
+            NoteEntity(timeStamp = 1000L, noteText = "note 1", mediaType = MediaType.TEXT),
+            NoteEntity(timeStamp = 2000L, noteText = "note 2", mediaType = MediaType.TEXT),
         )
         coEvery { mockTodayDao.getAllOnce(NoteMode.PERSONAL) } returns notes
 
@@ -65,7 +65,7 @@ class TodayRepositoryImplTest {
 
     @Test
     fun `flushTodayEntries clears today table after inserting entries`() = runTest {
-        coEvery { mockTodayDao.getAllOnce(NoteMode.PERSONAL) } returns listOf(NoteEntity(1L, "note", MediaType.TEXT))
+        coEvery { mockTodayDao.getAllOnce(NoteMode.PERSONAL) } returns listOf(NoteEntity(timeStamp = 1L, noteText = "note", mediaType = MediaType.TEXT))
 
         repo.flushTodayEntries(NoteMode.PERSONAL)
 
@@ -79,7 +79,7 @@ class TodayRepositoryImplTest {
             noteText = null,
             mediaType = MediaType.VOICE,
             mediaPath = "file://audio.m4a",
-            waveformPath = "file://waveform.png"
+            waveformPath = "file://waveform.png",
         )
         coEvery { mockTodayDao.getAllOnce(NoteMode.PERSONAL) } returns listOf(note)
 

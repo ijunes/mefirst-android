@@ -8,7 +8,7 @@ import androidx.core.content.edit
 
 class ModeStateHolder(context: Context) {
 
-    private val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+    private val prefs = context.getSharedPreferences("mode_prefs", Context.MODE_PRIVATE)
 
     private val _isWorkMode = MutableStateFlow(prefs.getBoolean("is_work_mode", false))
     val isWorkMode: StateFlow<Boolean> = _isWorkMode.asStateFlow()

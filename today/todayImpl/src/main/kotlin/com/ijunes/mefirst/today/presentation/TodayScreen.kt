@@ -30,7 +30,7 @@ fun TodayScreenPreview() {
             uiModel = TodayScreenUiModel(
                 messages =
                     listOf(
-                        Message(timeStamp = System.currentTimeMillis(), text = "Hello")
+                        Message(id = "preview", timeStamp = System.currentTimeMillis(), text = "Hello")
                     )
             ),
             isRecording = false,

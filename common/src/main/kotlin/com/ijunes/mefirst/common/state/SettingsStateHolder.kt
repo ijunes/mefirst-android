@@ -9,7 +9,7 @@ import java.security.MessageDigest
 import java.security.SecureRandom
 
 private object Settings {
-    const val PREFS_NAME = "app_prefs"
+    const val PREFS_NAME = "settings_prefs"
     const val FLUSH_HOUR = "flush_hour"
     const val FLUSH_MINUTE = "flush_minute"
     const val PIN_HASH = "pin_hash"

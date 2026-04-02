@@ -8,6 +8,7 @@ import androidx.core.content.FileProvider
 import com.ijunes.mefirst.common.action.MainAction
 import com.ijunes.mefirst.common.state.ModeStateHolder
 import com.ijunes.mefirst.database.model.NoteMode
+import com.ijunes.mefirst.today.recording.AudioRecordingManager
 import com.ijunes.today.data.TodayRepository
 import com.ijunes.today.domain.TodayAction
 import io.mockk.coVerify
@@ -39,6 +40,7 @@ class TodayScreenViewModelImplTest {
     private lateinit var mockRepo: TodayRepository
     private lateinit var mockModeHolder: ModeStateHolder
     private lateinit var mockApp: Application
+    private lateinit var mockAudioRecordingManager: AudioRecordingManager
 
     private val modeFlow = MutableStateFlow(false)
 
@@ -59,10 +61,13 @@ class TodayScreenViewModelImplTest {
             every { checkSelfPermission(Manifest.permission.RECORD_AUDIO) } returns
                 PackageManager.PERMISSION_DENIED
         }
+        mockAudioRecordingManager = mockk(relaxed = true) {
+            every { isRecording } returns MutableStateFlow(false)
+        }
 
         every { mockRepo.getAllNotes(any()) } returns emptyFlow()
 
-        viewModel = TodayScreenViewModelImpl(mockApp, mockRepo, mockModeHolder)
+        viewModel = TodayScreenViewModelImpl(mockApp, mockRepo, mockModeHolder, mockAudioRecordingManager, testDispatcher)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)

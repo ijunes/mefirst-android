@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface TodayRepository {
 
-    suspend fun deleteTodayNote(timestamp: Long, mode: NoteMode)
+    suspend fun deleteTodayNote(id: String)
 
     fun getAllNotes(mode: NoteMode): Flow<List<NoteEntity>>
 

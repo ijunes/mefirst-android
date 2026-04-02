@@ -5,10 +5,12 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.ijunes.mefirst.database.model.MediaType
 import com.ijunes.mefirst.database.model.NoteMode
+import java.util.UUID
 
 @Entity(tableName = "today")
 data class NoteEntity(
-    @PrimaryKey val timeStamp: Long,
+    @PrimaryKey val id: String = UUID.randomUUID().toString(),
+    val timeStamp: Long,
     @ColumnInfo(name = "note_text") val noteText: String? = null,
     @ColumnInfo(name = "media_type") val mediaType: MediaType = MediaType.TEXT,
     @ColumnInfo(name = "media_path") val mediaPath: String? = null,

@@ -6,6 +6,7 @@ import com.ijunes.mefirst.database.entity.NoteEntity
 import com.ijunes.mefirst.database.model.NoteMode
 import com.ijunes.today.data.TodayRepository
 import kotlinx.coroutines.flow.Flow
+import java.util.UUID
 
 class TodayRepositoryImpl(private val database: MeFirstDatabase) : TodayRepository {
 
@@ -20,6 +21,7 @@ class TodayRepositoryImpl(private val database: MeFirstDatabase) : TodayReposito
     override suspend fun flushTodayEntries(mode: NoteMode) {
         val entryList = database.todayDao().getAllOnce(mode).map { note ->
             EntryEntity(
+                id = UUID.randomUUID().toString(),
                 timeStamp = note.timeStamp,
                 text = note.noteText,
                 mediaType = note.mediaType,
@@ -32,8 +34,8 @@ class TodayRepositoryImpl(private val database: MeFirstDatabase) : TodayReposito
         database.todayDao().deleteAll(mode)
     }
 
-    override suspend fun deleteTodayNote(timestamp: Long, mode: NoteMode) {
-        database.todayDao().delete(timestamp, mode)
+    override suspend fun deleteTodayNote(id: String) {
+        database.todayDao().delete(id)
     }
 
 }
