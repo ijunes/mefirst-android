@@ -7,10 +7,9 @@ import android.net.Uri
 import androidx.core.content.FileProvider
 import com.ijunes.mefirst.common.action.MainAction
 import com.ijunes.mefirst.common.state.ModeStateHolder
+import com.ijunes.mefirst.database.model.NoteMode
 import com.ijunes.today.data.TodayRepository
-import com.ijunes.today.data.WorkTodayRepository
 import com.ijunes.today.domain.TodayAction
-import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
@@ -33,18 +32,11 @@ import org.junit.Before
 import org.junit.Test
 import java.io.File
 
-/**
- * Unit tests for [TodayScreenViewModelImpl.handleEvent] dispatch logic.
- *
- * Repositories and [ModeStateHolder] are mocked and registered in a test Koin module under their
- * interface types, matching the production bindings in `:today:todayApp`.
- */
 class TodayScreenViewModelImplTest {
 
     private val testDispatcher = StandardTestDispatcher()
 
-    private lateinit var mockPersonalRepo: TodayRepository
-    private lateinit var mockWorkRepo: WorkTodayRepository
+    private lateinit var mockRepo: TodayRepository
     private lateinit var mockModeHolder: ModeStateHolder
     private lateinit var mockApp: Application
 
@@ -57,8 +49,7 @@ class TodayScreenViewModelImplTest {
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
 
-        mockPersonalRepo = mockk(relaxed = true)
-        mockWorkRepo = mockk(relaxed = true)
+        mockRepo = mockk(relaxed = true)
         mockModeHolder = mockk(relaxed = true) {
             every { isWorkMode } returns modeFlow
         }
@@ -69,10 +60,9 @@ class TodayScreenViewModelImplTest {
                 PackageManager.PERMISSION_DENIED
         }
 
-        every { mockPersonalRepo.getAllNotes() } returns emptyFlow()
-        every { mockWorkRepo.getAllNotes() } returns emptyFlow()
+        every { mockRepo.getAllNotes(any()) } returns emptyFlow()
 
-        viewModel = TodayScreenViewModelImpl(mockApp, mockPersonalRepo, mockWorkRepo, mockModeHolder)
+        viewModel = TodayScreenViewModelImpl(mockApp, mockRepo, mockModeHolder)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -91,7 +81,7 @@ class TodayScreenViewModelImplTest {
         viewModel.handleEvent(MainAction.SendChat("hello"))
         testDispatcher.scheduler.advanceUntilIdle()
 
-        coVerify { mockPersonalRepo.insertNote(match { it.noteText == "hello" }) }
+        coVerify { mockRepo.insertNote(match { it.noteText == "hello" && it.mode == NoteMode.PERSONAL }) }
     }
 
     @Test
@@ -101,7 +91,7 @@ class TodayScreenViewModelImplTest {
         viewModel.handleEvent(MainAction.SendChat("stand-up done"))
         testDispatcher.scheduler.advanceUntilIdle()
 
-        coVerify { mockWorkRepo.insertNote(match { it.noteText == "stand-up done" }) }
+        coVerify { mockRepo.insertNote(match { it.noteText == "stand-up done" && it.mode == NoteMode.WORK }) }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -112,8 +102,6 @@ class TodayScreenViewModelImplTest {
         } returns PackageManager.PERMISSION_DENIED
 
         var received: TodayAction? = null
-        // UnconfinedTestDispatcher runs the collector eagerly so it is subscribed before
-        // handleEvent fires tryEmit.
         val job = backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             viewModel.actions.collect { received = it }
         }
@@ -133,7 +121,7 @@ class TodayScreenViewModelImplTest {
         viewModel.handleEvent(MainAction.DeleteToday)
         testDispatcher.scheduler.advanceUntilIdle()
 
-        coVerify { mockPersonalRepo.flushTodayEntries() }
+        coVerify { mockRepo.flushTodayEntries(NoteMode.PERSONAL) }
     }
 
     @Test
@@ -143,7 +131,7 @@ class TodayScreenViewModelImplTest {
         viewModel.handleEvent(MainAction.DeleteToday)
         testDispatcher.scheduler.advanceUntilIdle()
 
-        coVerify { mockWorkRepo.flushTodayEntries() }
+        coVerify { mockRepo.flushTodayEntries(NoteMode.WORK) }
     }
 
     // ── OpenGallery ───────────────────────────────────────────────────────────

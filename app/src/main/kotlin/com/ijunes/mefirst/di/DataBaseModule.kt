@@ -3,6 +3,7 @@ package com.ijunes.mefirst.di
 import android.app.Application
 import androidx.room.Room
 import com.ijunes.mefirst.database.MIGRATION_1_2
+import com.ijunes.mefirst.database.MIGRATION_2_3
 import com.ijunes.mefirst.database.MeFirstDatabase
 import org.koin.android.ext.koin.androidApplication
 import org.koin.dsl.module
@@ -11,20 +12,14 @@ fun provideDataBase(application: Application): MeFirstDatabase = Room.databaseBu
     application,
     MeFirstDatabase::class.java,
     "me_first"
-).addMigrations(MIGRATION_1_2).fallbackToDestructiveMigration(false).build()
+).addMigrations(MIGRATION_1_2, MIGRATION_2_3).fallbackToDestructiveMigration(false).build()
 
 fun provideTodayDao(meFirstDatabase: MeFirstDatabase) = meFirstDatabase.todayDao()
 
 fun provideEntriesDao(meFirstDatabase: MeFirstDatabase) = meFirstDatabase.entriesDao()
 
-fun provideWorkTodayDao(meFirstDatabase: MeFirstDatabase) = meFirstDatabase.workTodayDao()
-
-fun provideWorkEntriesDao(meFirstDatabase: MeFirstDatabase) = meFirstDatabase.workEntriesDao()
-
 val databaseModule = module {
     single { provideDataBase(androidApplication()) }
     single { provideTodayDao(get()) }
     single { provideEntriesDao(get()) }
-    single { provideWorkTodayDao(get()) }
-    single { provideWorkEntriesDao(get()) }
 }

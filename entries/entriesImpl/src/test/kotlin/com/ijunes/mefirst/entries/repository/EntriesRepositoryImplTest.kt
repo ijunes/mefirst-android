@@ -4,6 +4,7 @@ import com.ijunes.mefirst.data.dao.EntriesDao
 import com.ijunes.mefirst.database.MeFirstDatabase
 import com.ijunes.mefirst.database.entity.EntryEntity
 import com.ijunes.mefirst.database.model.MediaType
+import com.ijunes.mefirst.database.model.NoteMode
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.flow.first
@@ -47,9 +48,9 @@ class EntriesRepositoryImplTest {
     fun `getAllEntries groups two entries from the same day under one key`() = runTest {
         val morning = entryAt(2024, Calendar.MARCH, 10, 9)
         val evening = entryAt(2024, Calendar.MARCH, 10, 20)
-        every { mockDao.getAllEntries() } returns flowOf(listOf(morning, evening))
+        every { mockDao.getAllEntries(NoteMode.PERSONAL) } returns flowOf(listOf(morning, evening))
 
-        val result = repo.getAllEntries().first()
+        val result = repo.getAllEntries(NoteMode.PERSONAL).first()
 
         Assert.assertEquals(1, result.size)
         Assert.assertEquals(2, result.values.first().size)
@@ -59,9 +60,9 @@ class EntriesRepositoryImplTest {
     fun `getAllEntries places entries from different days under separate keys`() = runTest {
         val dayOne = entryAt(2024, Calendar.MARCH, 10, 9)
         val dayTwo = entryAt(2024, Calendar.MARCH, 11, 9)
-        every { mockDao.getAllEntries() } returns flowOf(listOf(dayOne, dayTwo))
+        every { mockDao.getAllEntries(NoteMode.PERSONAL) } returns flowOf(listOf(dayOne, dayTwo))
 
-        val result = repo.getAllEntries().first()
+        val result = repo.getAllEntries(NoteMode.PERSONAL).first()
 
         Assert.assertEquals(2, result.size)
     }
@@ -69,9 +70,9 @@ class EntriesRepositoryImplTest {
     @Test
     fun `getAllEntries key is normalized to midnight of the entry date`() = runTest {
         val entry = entryAt(2024, Calendar.MARCH, 10, 14)
-        every { mockDao.getAllEntries() } returns flowOf(listOf(entry))
+        every { mockDao.getAllEntries(NoteMode.PERSONAL) } returns flowOf(listOf(entry))
 
-        val result = repo.getAllEntries().first()
+        val result = repo.getAllEntries(NoteMode.PERSONAL).first()
         val key = result.keys.first()
 
         val cal = Calendar.getInstance().apply { timeInMillis = key }
@@ -83,9 +84,9 @@ class EntriesRepositoryImplTest {
 
     @Test
     fun `getAllEntries returns empty map when dao returns no entries`() = runTest {
-        every { mockDao.getAllEntries() } returns flowOf(emptyList())
+        every { mockDao.getAllEntries(NoteMode.PERSONAL) } returns flowOf(emptyList())
 
-        val result = repo.getAllEntries().first()
+        val result = repo.getAllEntries(NoteMode.PERSONAL).first()
 
         Assert.assertEquals(emptyMap<Long, List<EntryEntity>>(), result)
     }

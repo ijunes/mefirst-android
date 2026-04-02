@@ -20,10 +20,9 @@ import com.ijunes.mefirst.common.action.MainAction
 import com.ijunes.mefirst.common.data.Message
 import com.ijunes.mefirst.common.state.ModeStateHolder
 import com.ijunes.mefirst.database.entity.NoteEntity
-import com.ijunes.mefirst.database.entity.WorkTodayEntity
 import com.ijunes.mefirst.database.model.MediaType
+import com.ijunes.mefirst.database.model.NoteMode
 import com.ijunes.today.data.TodayRepository
-import com.ijunes.today.data.WorkTodayRepository
 import com.ijunes.today.domain.TodayAction
 import com.ijunes.today.presentation.TodayViewModel
 import kotlinx.coroutines.Dispatchers
@@ -48,37 +47,26 @@ import androidx.core.graphics.createBitmap
 
 class TodayScreenViewModelImpl(
     application: Application,
-    private val personalRepo: TodayRepository,
-    private val workRepo: WorkTodayRepository,
+    private val repo: TodayRepository,
     private val modeHolder: ModeStateHolder,
 ) : TodayViewModel(application) {
+
+    private val activeMode: NoteMode
+        get() = if (modeHolder.isWorkMode.value) NoteMode.WORK else NoteMode.PERSONAL
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override val conversation: StateFlow<List<Message>> = modeHolder.isWorkMode
         .flatMapLatest { isWork ->
-            if (isWork) {
-                workRepo.getAllNotes().map { notes ->
-                    notes.map {
-                        Message(
-                            text = it.noteText ?: "",
-                            mediaType = it.mediaType,
-                            timeStamp = it.timeStamp,
-                            mediaPath = it.mediaPath?.toUri(),
-                            waveformPath = it.waveformPath?.toUri()
-                        )
-                    }
-                }
-            } else {
-                personalRepo.getAllNotes().map { notes ->
-                    notes.map {
-                        Message(
-                            text = it.noteText ?: "",
-                            mediaType = it.mediaType,
-                            timeStamp = it.timeStamp,
-                            mediaPath = it.mediaPath?.toUri(),
-                            waveformPath = it.waveformPath?.toUri()
-                        )
-                    }
+            val mode = if (isWork) NoteMode.WORK else NoteMode.PERSONAL
+            repo.getAllNotes(mode).map { notes ->
+                notes.map {
+                    Message(
+                        text = it.noteText ?: "",
+                        mediaType = it.mediaType,
+                        timeStamp = it.timeStamp,
+                        mediaPath = it.mediaPath?.toUri(),
+                        waveformPath = it.waveformPath?.toUri()
+                    )
                 }
             }
         }
@@ -93,7 +81,6 @@ class TodayScreenViewModelImpl(
     private val _pendingImageUri = MutableStateFlow<Uri?>(null)
     override val pendingImageUri: StateFlow<Uri?> = _pendingImageUri
 
-    // Dispatches a suspend block on Dispatchers.IO, logging any uncaught exceptions.
     private fun launchIO(block: suspend () -> Unit) {
         viewModelScope.launch {
             try {
@@ -103,12 +90,6 @@ class TodayScreenViewModelImpl(
             }
         }
     }
-
-    // Runs personal or work repo operation based on the active mode.
-    private suspend fun <T> withActiveRepo(
-        personal: suspend (TodayRepository) -> T,
-        work: suspend (WorkTodayRepository) -> T,
-    ): T = if (modeHolder.isWorkMode.value) work(workRepo) else personal(personalRepo)
 
     override fun handleEvent(event: MainAction) {
         val app = getApplication<Application>()
@@ -145,10 +126,7 @@ class TodayScreenViewModelImpl(
 
     override fun insertNote(msg: String) {
         launchIO {
-            withActiveRepo(
-                personal = { it.insertNote(NoteEntity(System.currentTimeMillis(), msg)) },
-                work = { it.insertNote(WorkTodayEntity(System.currentTimeMillis(), msg)) },
-            )
+            repo.insertNote(NoteEntity(System.currentTimeMillis(), msg, mode = activeMode))
         }
     }
 
@@ -160,10 +138,7 @@ class TodayScreenViewModelImpl(
         val uri = _pendingImageUri.value ?: return
         _pendingImageUri.value = null
         launchIO {
-            withActiveRepo(
-                personal = { it.insertNote(NoteEntity(System.currentTimeMillis(), mediaType = MediaType.IMAGE, mediaPath = uri.toString())) },
-                work = { it.insertNote(WorkTodayEntity(System.currentTimeMillis(), mediaType = MediaType.IMAGE, mediaPath = uri.toString())) },
-            )
+            repo.insertNote(NoteEntity(System.currentTimeMillis(), mediaType = MediaType.IMAGE, mediaPath = uri.toString(), mode = activeMode))
         }
     }
 
@@ -202,6 +177,7 @@ class TodayScreenViewModelImpl(
         amplitudeSamplingJob = null
         val samples = amplitudeSamples.toList()
         amplitudeSamples.clear()
+        val mode = activeMode
 
         try {
             mediaRecorder?.stop()
@@ -214,10 +190,7 @@ class TodayScreenViewModelImpl(
                     val authority = "${app.packageName}.fileprovider"
                     val audioUri = FileProvider.getUriForFile(app, authority, audioFile)
                     val waveformUri = waveformFile?.let { FileProvider.getUriForFile(app, authority, it) }
-                    withActiveRepo(
-                        personal = { it.insertNote(NoteEntity(System.currentTimeMillis(), mediaType = MediaType.VOICE, mediaPath = audioUri.toString(), waveformPath = waveformUri?.toString())) },
-                        work = { it.insertNote(WorkTodayEntity(System.currentTimeMillis(), mediaType = MediaType.VOICE, mediaPath = audioUri.toString(), waveformPath = waveformUri?.toString())) },
-                    )
+                    repo.insertNote(NoteEntity(System.currentTimeMillis(), mediaType = MediaType.VOICE, mediaPath = audioUri.toString(), waveformPath = waveformUri?.toString(), mode = mode))
                 }
             }
         } catch (_: Exception) {
@@ -266,19 +239,13 @@ class TodayScreenViewModelImpl(
 
     fun clearToday() {
         launchIO {
-            withActiveRepo(
-                personal = { it.flushTodayEntries() },
-                work = { it.flushTodayEntries() },
-            )
+            repo.flushTodayEntries(activeMode)
         }
     }
 
     fun deleteTodayNote(message: Message) {
         launchIO {
-            withActiveRepo(
-                personal = { it.deleteTodayNote(message.timeStamp) },
-                work = { it.deleteTodayNote(message.timeStamp) },
-            )
+            repo.deleteTodayNote(message.timeStamp, activeMode)
         }
     }
 

@@ -6,6 +6,7 @@ import com.ijunes.mefirst.database.MeFirstDatabase
 import com.ijunes.mefirst.database.entity.EntryEntity
 import com.ijunes.mefirst.database.entity.NoteEntity
 import com.ijunes.mefirst.database.model.MediaType
+import com.ijunes.mefirst.database.model.NoteMode
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
@@ -46,7 +47,7 @@ class TodayRepositoryImplTest {
             NoteEntity(1000L, "note 1", MediaType.TEXT),
             NoteEntity(2000L, "note 2", MediaType.TEXT),
         )
-        coEvery { mockTodayDao.getAllOnce() } returns notes
+        coEvery { mockTodayDao.getAllOnce(NoteMode.PERSONAL) } returns notes
 
         val insertedEntries = mutableListOf<EntryEntity>()
         every { mockEntriesDao.addAllNoteEntries(*anyVararg()) } answers {
@@ -54,7 +55,7 @@ class TodayRepositoryImplTest {
             insertedEntries.addAll(args[0] as Array<EntryEntity>)
         }
 
-        repo.flushTodayEntries()
+        repo.flushTodayEntries(NoteMode.PERSONAL)
 
         Assert.assertEquals(2, insertedEntries.size)
         Assert.assertEquals(1000L, insertedEntries[0].timeStamp)
@@ -64,11 +65,11 @@ class TodayRepositoryImplTest {
 
     @Test
     fun `flushTodayEntries clears today table after inserting entries`() = runTest {
-        coEvery { mockTodayDao.getAllOnce() } returns listOf(NoteEntity(1L, "note", MediaType.TEXT))
+        coEvery { mockTodayDao.getAllOnce(NoteMode.PERSONAL) } returns listOf(NoteEntity(1L, "note", MediaType.TEXT))
 
-        repo.flushTodayEntries()
+        repo.flushTodayEntries(NoteMode.PERSONAL)
 
-        verify { mockTodayDao.deleteAll() }
+        verify { mockTodayDao.deleteAll(NoteMode.PERSONAL) }
     }
 
     @Test
@@ -80,7 +81,7 @@ class TodayRepositoryImplTest {
             mediaPath = "file://audio.m4a",
             waveformPath = "file://waveform.png"
         )
-        coEvery { mockTodayDao.getAllOnce() } returns listOf(note)
+        coEvery { mockTodayDao.getAllOnce(NoteMode.PERSONAL) } returns listOf(note)
 
         val insertedEntries = mutableListOf<EntryEntity>()
         every { mockEntriesDao.addAllNoteEntries(*anyVararg()) } answers {
@@ -88,7 +89,7 @@ class TodayRepositoryImplTest {
             insertedEntries.addAll(args[0] as Array<EntryEntity>)
         }
 
-        repo.flushTodayEntries()
+        repo.flushTodayEntries(NoteMode.PERSONAL)
 
         val entry = insertedEntries.single()
         Assert.assertEquals(MediaType.VOICE, entry.mediaType)

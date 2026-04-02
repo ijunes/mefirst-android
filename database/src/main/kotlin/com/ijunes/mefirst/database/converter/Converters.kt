@@ -2,6 +2,7 @@ package com.ijunes.mefirst.database.converter
 
 import androidx.room.TypeConverter
 import com.ijunes.mefirst.database.model.MediaType
+import com.ijunes.mefirst.database.model.NoteMode
 
 class Converters {
 
@@ -10,5 +11,11 @@ class Converters {
 
     @TypeConverter
     fun mediaTypeToInt(mediaType: MediaType) = mediaType.ordinal
+
+    @TypeConverter
+    fun toNoteMode(value: String): NoteMode = NoteMode.valueOf(value)
+
+    @TypeConverter
+    fun noteModeToString(mode: NoteMode): String = mode.name
 
 }

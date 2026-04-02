@@ -8,12 +8,8 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.ijunes.mefirst.database.converter.Converters
 import com.ijunes.mefirst.database.entity.EntryEntity
 import com.ijunes.mefirst.database.entity.NoteEntity
-import com.ijunes.mefirst.database.entity.WorkEntryEntity
-import com.ijunes.mefirst.database.entity.WorkTodayEntity
 import com.ijunes.mefirst.data.dao.EntriesDao
 import com.ijunes.mefirst.data.dao.TodayDao
-import com.ijunes.mefirst.data.dao.WorkEntriesDao
-import com.ijunes.mefirst.data.dao.WorkTodayDao
 
 val MIGRATION_1_2 = object : Migration(1, 2) {
     override fun migrate(db: SupportSQLiteDatabase) {
@@ -30,9 +26,20 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
     }
 }
 
+val MIGRATION_2_3 = object : Migration(2, 3) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE `today` ADD COLUMN `mode` TEXT NOT NULL DEFAULT 'PERSONAL'")
+        db.execSQL("INSERT INTO `today` (timeStamp, note_text, media_type, media_path, waveform_path, mode) SELECT timeStamp, note_text, media_type, media_path, waveform_path, 'WORK' FROM `work_today`")
+        db.execSQL("DROP TABLE `work_today`")
+        db.execSQL("ALTER TABLE `entries` ADD COLUMN `mode` TEXT NOT NULL DEFAULT 'PERSONAL'")
+        db.execSQL("INSERT INTO `entries` (timeStamp, entry_text, media_type, media_path, waveform_path, mode) SELECT timeStamp, entry_text, media_type, media_path, waveform_path, 'WORK' FROM `work_entries`")
+        db.execSQL("DROP TABLE `work_entries`")
+    }
+}
+
 @Database(
-    entities = [NoteEntity::class, EntryEntity::class, WorkTodayEntity::class, WorkEntryEntity::class],
-    version = 2
+    entities = [NoteEntity::class, EntryEntity::class],
+    version = 3
 )
 @TypeConverters(Converters::class)
 abstract class MeFirstDatabase : RoomDatabase() {
@@ -40,8 +47,4 @@ abstract class MeFirstDatabase : RoomDatabase() {
     abstract fun todayDao(): TodayDao
 
     abstract fun entriesDao(): EntriesDao
-
-    abstract fun workTodayDao(): WorkTodayDao
-
-    abstract fun workEntriesDao(): WorkEntriesDao
 }

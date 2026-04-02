@@ -5,8 +5,8 @@ import android.content.Context
 import android.content.Intent
 import com.ijunes.mefirst.settings.alarm.MidnightAlarmScheduler
 import com.ijunes.mefirst.common.state.SettingsStateHolder
+import com.ijunes.mefirst.database.model.NoteMode
 import com.ijunes.today.data.TodayRepository
-import com.ijunes.today.data.WorkTodayRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -16,7 +16,6 @@ import kotlin.getValue
 class TimeFlushReceiver : BroadcastReceiver() {
 
     private val todayRepo: TodayRepository by inject(TodayRepository::class.java)
-    private val workTodayRepo: WorkTodayRepository by inject(WorkTodayRepository::class.java)
     private val settingsStateHolder: SettingsStateHolder by inject(SettingsStateHolder::class.java)
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -25,8 +24,8 @@ class TimeFlushReceiver : BroadcastReceiver() {
                 val result = goAsync()
                 CoroutineScope(Dispatchers.IO).launch {
                     try {
-                        todayRepo.flushTodayEntries()
-                        workTodayRepo.flushTodayEntries()
+                        todayRepo.flushTodayEntries(NoteMode.PERSONAL)
+                        todayRepo.flushTodayEntries(NoteMode.WORK)
                     } finally {
                         result.finish()
                     }

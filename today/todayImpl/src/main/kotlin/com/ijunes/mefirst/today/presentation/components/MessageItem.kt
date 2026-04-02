@@ -62,7 +62,7 @@ fun MessageItem(
                         bottomEnd = 0f
                     )
                 )
-                .background(MaterialTheme.colorScheme.onTertiaryFixed)
+                .background(MaterialTheme.colorScheme.primaryContainer)
                 .padding(16.dp)
         ) {
             when (message.mediaType) {
