@@ -8,9 +8,9 @@ import com.ijunes.mefirst.database.entity.NoteEntity
 import com.ijunes.mefirst.database.model.MediaType
 import com.ijunes.mefirst.database.model.NoteMode
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.verify
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before
@@ -38,7 +38,7 @@ class TodayRepositoryImplTest {
     fun `insertNote delegates to todayDao insert`() = runTest {
         val note = NoteEntity(timeStamp = 1L, noteText = "hello")
         repo.insertNote(note)
-        verify { mockTodayDao.insert(note) }
+        coVerify { mockTodayDao.insert(note) }
     }
 
     @Test
@@ -50,7 +50,7 @@ class TodayRepositoryImplTest {
         coEvery { mockTodayDao.getAllOnce(NoteMode.PERSONAL) } returns notes
 
         val insertedEntries = mutableListOf<EntryEntity>()
-        every { mockEntriesDao.addAllNoteEntries(*anyVararg()) } answers {
+        coEvery { mockEntriesDao.addAllNoteEntries(*anyVararg()) } answers {
             @Suppress("UNCHECKED_CAST")
             insertedEntries.addAll(args[0] as Array<EntryEntity>)
         }
@@ -69,7 +69,7 @@ class TodayRepositoryImplTest {
 
         repo.flushTodayEntries(NoteMode.PERSONAL)
 
-        verify { mockTodayDao.deleteAll(NoteMode.PERSONAL) }
+        coVerify { mockTodayDao.deleteAll(NoteMode.PERSONAL) }
     }
 
     @Test
@@ -84,7 +84,7 @@ class TodayRepositoryImplTest {
         coEvery { mockTodayDao.getAllOnce(NoteMode.PERSONAL) } returns listOf(note)
 
         val insertedEntries = mutableListOf<EntryEntity>()
-        every { mockEntriesDao.addAllNoteEntries(*anyVararg()) } answers {
+        coEvery { mockEntriesDao.addAllNoteEntries(*anyVararg()) } answers {
             @Suppress("UNCHECKED_CAST")
             insertedEntries.addAll(args[0] as Array<EntryEntity>)
         }

@@ -17,12 +17,12 @@ interface TodayDao {
     suspend fun getAllOnce(mode: NoteMode): List<NoteEntity>
 
     @Insert
-    fun insert(note: NoteEntity)
+    suspend fun insert(note: NoteEntity)
 
     @Query("DELETE FROM today WHERE id = :id")
-    fun delete(id: String)
+    suspend fun delete(id: String)
 
     @Query("DELETE FROM today WHERE mode = :mode")
-    fun deleteAll(mode: NoteMode)
+    suspend fun deleteAll(mode: NoteMode)
 
 }

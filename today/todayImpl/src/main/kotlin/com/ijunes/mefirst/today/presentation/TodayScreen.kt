@@ -106,7 +106,7 @@ fun TodayScreen(
             verticalArrangement = Arrangement.Bottom,
             contentPadding = PaddingValues(16.dp)
         ) {
-            items(uiModel.messages) { item ->
+            items(uiModel.messages, key = { it.id }) { item ->
                 MessageItem(message = item) {
                     onDeleteMessage(item)
                 }

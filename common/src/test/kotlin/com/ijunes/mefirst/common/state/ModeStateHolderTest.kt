@@ -24,7 +24,7 @@ class ModeStateHolderTest {
             every { edit() } returns mockEditor
         }
         mockContext = mockk {
-            every { getSharedPreferences("app_prefs", Context.MODE_PRIVATE) } returns mockPrefs
+            every { getSharedPreferences("mode_prefs", Context.MODE_PRIVATE) } returns mockPrefs
         }
         holder = ModeStateHolder(mockContext)
     }

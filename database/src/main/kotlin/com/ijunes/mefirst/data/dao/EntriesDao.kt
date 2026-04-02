@@ -17,9 +17,9 @@ interface EntriesDao {
     fun getEntriesByDate(startOfDay: Long, endOfDay: Long, mode: NoteMode): Flow<List<EntryEntity>>
 
     @Insert
-    fun addAllNoteEntries(vararg entries: EntryEntity)
+    suspend fun addAllNoteEntries(vararg entries: EntryEntity)
 
     @Query("DELETE FROM entries WHERE mode = :mode")
-    fun deleteAll(mode: NoteMode)
+    suspend fun deleteAll(mode: NoteMode)
 
 }

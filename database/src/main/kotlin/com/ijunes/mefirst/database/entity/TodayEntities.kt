@@ -2,12 +2,16 @@ package com.ijunes.mefirst.database.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.ijunes.mefirst.database.model.MediaType
 import com.ijunes.mefirst.database.model.NoteMode
 import java.util.UUID
 
-@Entity(tableName = "today")
+@Entity(
+    tableName = "today",
+    indices = [Index(value = ["mode"])]
+)
 data class NoteEntity(
     @PrimaryKey val id: String = UUID.randomUUID().toString(),
     val timeStamp: Long,

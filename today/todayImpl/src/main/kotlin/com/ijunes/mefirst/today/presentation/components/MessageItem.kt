@@ -78,7 +78,7 @@ fun MessageItem(
                 else -> message.text?.let {
                     Text(
                         text = it,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                        color = MaterialTheme.colorScheme.onPrimary
                     )
                 }
             }

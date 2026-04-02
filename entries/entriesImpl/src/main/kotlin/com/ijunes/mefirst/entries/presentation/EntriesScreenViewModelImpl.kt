@@ -16,6 +16,10 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
+// How long a StateFlow stays active after the last subscriber unsubscribes, giving
+// the UI time to resubscribe during configuration changes without restarting the query.
+private const val FLOW_TIMEOUT_MS = 5_000L
+
 class EntriesScreenViewModelImpl(
     private val repo: EntriesRepository,
     private val modeHolder: ModeStateHolder,
@@ -41,5 +45,5 @@ class EntriesScreenViewModelImpl(
             }
         }
         .catch { e -> Log.e("EntriesViewModel", "Failed to load entries", e) }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyMap())
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(FLOW_TIMEOUT_MS), emptyMap())
 }

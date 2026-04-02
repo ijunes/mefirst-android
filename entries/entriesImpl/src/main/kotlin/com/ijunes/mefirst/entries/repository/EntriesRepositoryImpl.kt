@@ -17,6 +17,9 @@ class EntriesRepositoryImpl(private val database: MeFirstDatabase) : EntriesRepo
         return database.entriesDao().getEntriesByDate(startOfDay, endOfDay, mode)
     }
 
+    // Groups all entries in memory after a single DB fetch. Acceptable given personal-scale
+    // datasets (typically <500 entries). If entry counts grow significantly, push the date
+    // truncation into SQL via a generated column or Room view.
     override fun getAllEntries(mode: NoteMode): Flow<Map<Long, List<EntryEntity>>> {
         return database.entriesDao().getAllEntries(mode).map { entries ->
             entries.groupBy { entry -> normalizeToMidnight(entry.timeStamp) }
